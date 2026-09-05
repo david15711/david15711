@@ -14,7 +14,7 @@ jobs:
     name: generate-github-profile-3d-contrib
     steps:
       - uses: actions/checkout@v5
-      - uses: david15711/github-profile-3d-contrib@latest
+      - uses: david15711/david15711
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
           USERNAME: ${{ github.repository_owner }}

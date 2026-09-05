@@ -14,11 +14,11 @@ jobs:
     name: generate-github-profile-3d-contrib
     steps:
       - uses: actions/checkout@v5
-      - uses: yoshi389111/github-profile-3d-contrib@0.7.1
+      - uses: yoshi389111/github-profile-3d-contrib@main
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           USERNAME: ${{ github.repository_owner }}
-          SETTING_JSON: conf/profile-3d-contrib.json
+          SETTING_JSON: .conf/profile-3d-contrib.json
       - name: Commit & Push
         run: |
           git config user.name github-actions[bot]

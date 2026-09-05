@@ -18,7 +18,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN }}
           USERNAME: ${{ github.repository_owner }}
-          SETTING_JSON: conf/profile-3d-contrib.json
       - name: Commit & Push
         run: |
           git config user.name github-actions[bot]

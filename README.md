@@ -1,7 +1,6 @@
 ![header](https://capsule-render.vercel.app/api?type=transparent&color=auto&customColorList=2,3&text=Hello+World!&desc=from+david15711&descAlignY=75&descAlign=60)
 [![Typing.svg](https://readme-typing-svg.demolab.com?font=Roboto&duration=3500&pause=1050&color=04CF0F&background=FFFFFF00&center=true&width=900&lines=I'm+Embedded+Systems+Engineer.;I+am+proficient+in+Bare-metal+Firmware+and+RTOS.;And+I+am+an+engineer+who+thinks+deeply+about+what+to+do+and+why.)](https://git.io/typing-svg)
 ![profile-3d-contrib.svg](./profile-3d-contrib/profile-customize.svg)
-![profile-3d-contrib.svg](./profile-3d-contrib/profile-night-green.svg)
 
 ## 📚 Tech Stack  
 ### 💾 Embedded & Low-Level
@@ -144,6 +143,11 @@
 [Device Tree]:https://img.shields.io/badge/Device%20Tree-FCC624?style=flat-square&logo=linux&logoColor=black
 
 
+<!-- TODO: add 
+#### 🚀 My project 
+-
+
+-->
 <!--
 Here are some ideas to get you started:
 

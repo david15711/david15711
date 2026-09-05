@@ -1,4 +1,5 @@
 {
   "type": "night-view",
-  "bg": "transparent"
+  "bg": "#0D1117",
+  "color": "#eeeeff"
 }

@@ -1,7 +1,7 @@
 ## Hi there 👋
-<img src="https://capsule-render.vercel.app/api?type=waving&color=auto&height=200&section=header&text=david15711%20asdf&fontSize=50" width="100%" />
 
-![svg](./profile-3d-contrib/profile-night-view.svg)
+![svg](./profile-3d-contrib/profile-night-green.svg)
+<!--![My GitHub Contributions](https://ghchart.rshah.org/david15711) -->
 
 ## 📚 Tech Stack  
 ### 💾 Embedded & Low-Level

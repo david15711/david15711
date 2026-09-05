@@ -1,6 +1,17 @@
 {
   "type": "night-view",
   "backgroundColor": "#0D1117",
+  "foregroundColor": "#eeeeff",
+  "strongColor": "rgb(255,200,55)",
+  "weakColor": "#aaaaaa",
+  "radarColor": "#47a042",
+  "contribColors": [
+    "#444444",
+    "#1B7D28",
+    "#24A736",
+    "#2DD143",
+    "#57DA69"
+  ],
   "growingAnimation": true,
   "saturation": "100%",
   "contribLightness": [

@@ -164,11 +164,12 @@
 
 <!-- TODO: add 
 #### 🚀 My project 
+
 -
 
-🔗 **[전체 노트 문서 읽기](./docs/notes/C.md)** <!-- 프로필 저장소 안으로 복사된 파일 링크 -->
-
 -->
+
+
 <!--
 Here are some ideas to get you started:
 

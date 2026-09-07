@@ -143,9 +143,30 @@
 [Device Tree]:https://img.shields.io/badge/Device%20Tree-FCC624?style=flat-square&logo=linux&logoColor=black
 
 
+## 📚 Study Notes
+
+공부하며 작성한 필기입니다. 
+*각 항목을 클릭하면 동기화된 전체 문서로 이동합니다.*
+
+|    카테고리    | 주제                                                | 전체 문서 링크                                 |
+| :------------: | :-------------------------------------------------- | :--------------------------------------------- |
+|  **Language**  | C언어                                               | [📄 읽기](./docs/notes/C.md)                    |
+| **Language++** | C++                                                 | [📄 읽기](./docs/notes/C++.md)                  |
+|  **Language**  | C#                                                  | [📄 읽기](./docs/notes/C#.md)                   |
+|  **Embedded**  | Embedded System Basic (STM32)                       | [📄 읽기](./docs/notes/embedded_basic.md)       |
+|    **RTOS**    | RTOS 기본 usage (FreeRTOS)                          | [📄 읽기](./docs/notes/RTOS.md)                 |
+|   **Linux**    | Linux Bash shell                                    | [📄 읽기](./docs/notes/linux_bash.md)           |
+|   **Linux**    | Linux Application & Kernel                          | [📄 읽기](./docs/notes/linux_system.md)         |
+|   **Design**   | Software design methodology, architecture, patterns | [📄 읽기](./docs/notes/SW아키텍처와객체지향.md) |
+|   **Editor**   | vim motions, commands explaination for myself       | [📄 읽기](./docs/notes/vim.md)                  |
+
+---
+
 <!-- TODO: add 
 #### 🚀 My project 
 -
+
+🔗 **[전체 노트 문서 읽기](./docs/notes/C.md)** <!-- 프로필 저장소 안으로 복사된 파일 링크 -->
 
 -->
 <!--

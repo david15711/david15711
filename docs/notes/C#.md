@@ -1,3 +1,4 @@
+# C#
 
 - [C#](#c)
   - [기본](#기본)
@@ -56,7 +57,6 @@
 - [MVVM (Model View ViewModel)](#mvvm-model-view-viewmodel)
   - [생성자 인자로 받는 외부 함수를 Inject 받아 실행하는 객체.](#생성자-인자로-받는-외부-함수를-inject-받아-실행하는-객체)
 
-# C#
 ## 기본
 > C++과 JAVA의 혼종 언어.
 

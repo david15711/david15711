@@ -1,3 +1,5 @@
+# RTOS
+
 - [RTOS](#rtos)
   - [Introduction](#introduction)
     - [Scheduling](#scheduling)
@@ -26,7 +28,6 @@
     - [Porting](#porting)
   - [memo](#memo)
 
-# RTOS
 ## Introduction
 `TASK`: 태스크, 작업, 한가지 동작을 하는 쓰레드.
 - 각 태스크는 가상의 CPU를 각자 가지고 있는 것처럼 동작한다.

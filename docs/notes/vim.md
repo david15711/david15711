@@ -1,3 +1,5 @@
+# vim motions and commands
+
 ![영문이미지](<image/vim key bindings sheetjpg>)
 ![한글이미지](image/vim-shortkey-keyboardpng)
 

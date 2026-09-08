@@ -1,7 +1,7 @@
 # vim motions and commands
 
-![영문이미지](<image/vim key bindings sheetjpg>)
-![한글이미지](image/vim-shortkey-keyboardpng)
+![영문이미지](<image/vim key bindings sheet.jpg>)
+![한글이미지](image/vim-shortkey-keyboard.png)
 
 #### motion
 | key        | behavior                                                 |

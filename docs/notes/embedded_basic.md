@@ -590,20 +590,25 @@ NVIC_IPRx: configurable 인터럽트 우선순위
 STIR 레지스터에 쓰는 방법으로 특정 IRQ를 생성해서 ISR을 호출.
 
 #### 스택 프레임
+
 자동으로 context switching 하는것을 stacking이라 한다. push된 8개의 레지스터를 스택 프레임이라 한다.
 
+#### 익셉션 리턴 (EXC_RETURN)  
 
-#### 익셉션 리턴 (EXC_RETURN)
 ![alt text](image/EXC_RETURN.png)
 EXC_RETURN is the value loaded into the LR on exception entry.
 돌아가야할 쓰레드 모드, 특권 모드, 컨텍스트가 있는 스택을 명시한 테이블의 값을 사용, LR에 넣고 핸들러 진입.
 0xFFFFFFFx의 값이 PC에 들어가면 반환 처리 트리거링 실행.
 
-#### 메모리 리매핑 
-`SYSCFG_MEMRMP`: 0x00이 매핑되어 표시하는 실제 메모리를 선택한다.
+#### 메모리 리매핑  
+
+`SYSCFG_MEMRMP` : 레지스터 내부 `MEM_MODE` 비트가 0x00이 매핑되어 표시하는 실제 메모리를 결정한다.
+`Bus Matrix` 0x0~ 0x000F FFFF에 접근 시 디코더가 내부의 SYSCFG 리매핑 MUX 사용하여 분기, 리매핑한다.
+실제 0x00과 리매핑된 주소 (Main Flash의 경우 0x0800 0000)이 같은 주소를 가리키는 Aliasing이 발생한다.
 
 #### 벡터 테이블
-- Cortex-M 이외의 ARM의 경우, 함수의 주소 (Instruction의 Address)가 들어있지 않고 PC에 주소를 로드하는 명령어가 들어있다.
+
+- Cortex-M 이외의 ARM의 경우, 0x00에 함수의 주소 (Instruction의 Address)가 들어있지 않고 PC에 주소를 로드하는 명령어가 들어있다.
 - 0x00에는 stack pointer에 넣을 Stack의 끝의 주소값이 들어있다. (스택 초기화)
 - 0x04에는 Reset Handler의 주소가 들어있다. (런타임 초기화)
 

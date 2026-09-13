@@ -64,39 +64,58 @@
     - [Module Management Commands \& Auto-loading](#module-management-commands--auto-loading)
       - [모듈 관리 명령어](#모듈-관리-명령어)
       - [부팅 시 자동 모듈 적재 설정](#부팅-시-자동-모듈-적재-설정)
-    - [Kernel Module Parameters](#kernel-module-parameters)
-    - [Kernel Module Dependency \& Symbol Export](#kernel-module-dependency--symbol-export)
-      - [커널 심볼 (Kernel Symbol)](#커널-심볼-kernel-symbol)
-      - [심볼 내보내기 매크로](#심볼-내보내기-매크로)
-      - [`/lib/modules/$(uname -r)/` 의존성 관련 파일](#libmodulesuname--r-의존성-관련-파일)
-    - [Kernel Module License \& Safety Rules](#kernel-module-license--safety-rules)
-      - [라이선스 (License) 및 Tainted Kernel](#라이선스-license-및-tainted-kernel)
+    - [Kernel Module Parameters \& Dependencies](#kernel-module-parameters--dependencies)
+      - [Kernel Module Parameters](#kernel-module-parameters)
+      - [커널 심볼 (Kernel Symbol) 및 EXPORT\_SYMBOL](#커널-심볼-kernel-symbol-및-export_symbol)
+      - [`/lib/modules/$(uname -r)/` 의존성 파일](#libmodulesuname--r-의존성-파일)
+    - [Kernel Module License, Safety Rules \& Security](#kernel-module-license-safety-rules--security)
+      - [라이선스 및 Tainted Kernel](#라이선스-및-tainted-kernel)
       - [커널 모듈 작성 3대 안전 수칙](#커널-모듈-작성-3대-안전-수칙)
+      - [Linux Capability System \& 권한 제어](#linux-capability-system--권한-제어)
     - [Kernel Debugging Tools \& Log Levels (printk, dmesg)](#kernel-debugging-tools--log-levels-printk-dmesg)
       - [`printk` 및 `pr_*` 매크로](#printk-및-pr_-매크로)
-      - [커널 로그 레벨 (8단계)](#커널-로그-레벨-8단계)
-      - [콘솔 로그 레벨 제어 (`/proc/sys/kernel/printk`)](#콘솔-로그-레벨-제어-procsyskernelprintk)
+      - [커널 로그 레벨 (8단계) 및 콘솔 제어](#커널-로그-레벨-8단계-및-콘솔-제어)
   - [디바이스 드라이버 아키텍처 (Device Drivers Architecture)](#디바이스-드라이버-아키텍처-device-drivers-architecture)
     - [Software Stack for Hardware Access](#software-stack-for-hardware-access)
     - [Device Driver Types \& Device Numbers (Major/Minor)](#device-driver-types--device-numbers-majorminor)
       - [디바이스 드라이버 3대 분류](#디바이스-드라이버-3대-분류)
-      - [Device Number (디바이스 번호)](#device-number-디바이스-번호)
-      - [동적 주번호 할당 API](#동적-주번호-할당-api)
-    - [Memory Mapping (`ioremap`)](#memory-mapping-ioremap)
-    - [Address Spaces \& User/Kernel Data Exchange](#address-spaces--userkernel-data-exchange)
+      - [Device Number 생성 및 동적 주번호 할당 API](#device-number-생성-및-동적-주번호-할당-api)
+    - [Address Spaces \& Memory Mapping](#address-spaces--memory-mapping)
       - [주소 공간 구분 (32-bit ARM Linux 기준)](#주소-공간-구분-32-bit-arm-linux-기준)
-      - [유저-커널 간 안전한 데이터 교환](#유저-커널-간-안전한-데이터-교환)
+      - [I/O Memory Mapping (`ioremap`)](#io-memory-mapping-ioremap)
+      - [유저-커널 간 안전한 데이터 교환 (`copy_to_user`, `copy_from_user`)](#유저-커널-간-안전한-데이터-교환-copy_to_user-copy_from_user)
     - [Character Device Driver Architecture (`cdev` \& `struct file_operations`)](#character-device-driver-architecture-cdev--struct-file_operations)
       - [`struct file_operations` 정의](#struct-file_operations-정의)
       - [`cdev` 구조체 생성 및 등록](#cdev-구조체-생성-및-등록)
-      - [udev](#udev)
+      - [udev / devtmpfs (자동 디바이스 노드 생성)](#udev--devtmpfs-자동-디바이스-노드-생성)
     - [Driver Private Data Context (`private_data` \& `container_of`)](#driver-private-data-context-private_data--container_of)
       - [`struct file`의 `private_data`](#struct-file의-private_data)
       - [`container_of()` 매크로](#container_of-매크로)
     - [`ioctl` Interface](#ioctl-interface)
-    - [GPIO Subsystem](#gpio-subsystem)
-  - [커널 동적 메모리 할당 (Kernel Dynamic Memory Allocation)](#커널-동적-메모리-할당-kernel-dynamic-memory-allocation)
-  - [커널 인터럽트 \& 블로킹 I/O (GPIO Interrupt \& Blocking I/O)](#커널-인터럽트--블로킹-io-gpio-interrupt--blocking-io)
+    - [GPIO Subsystem \& Hardware Control](#gpio-subsystem--hardware-control)
+    - [Device Tree \& Platform Driver](#device-tree--platform-driver)
+      - [Device Tree 구조 및 노드 파싱 (DTS/DTB)](#device-tree-구조-및-노드-파싱-dtsdtb)
+        - [1. Device Tree 기본 개념 및 도입 배경](#1-device-tree-기본-개념-및-도입-배경)
+        - [2. 핵심 용어 및 컴파일 체계](#2-핵심-용어-및-컴파일-체계)
+        - [3. 기본 DTS 문법 및 노드 구조](#3-기본-dts-문법-및-노드-구조)
+          - [노드 및 속성 명명 규칙](#노드-및-속성-명명-규칙)
+          - [프로퍼티(Property) 데이터 타입](#프로퍼티property-데이터-타입)
+          - [핵심 공통 표준 속성](#핵심-공통-표준-속성)
+        - [4. `reg` 속성과 주소 지정 모델 (`#address-cells`, `#size-cells`)](#4-reg-속성과-주소-지정-모델-address-cells-size-cells)
+        - [5. `interrupts` 속성과 인터럽트 컨트롤러 (Interrupt Architecture)](#5-interrupts-속성과-인터럽트-컨트롤러-interrupt-architecture)
+        - [6. `ranges`와 버스 브리지 (Address Translation)](#6-ranges와-버스-브리지-address-translation)
+        - [7. 핵심 표준 노드 (Standard Well-Known Nodes)](#7-핵심-표준-노드-standard-well-known-nodes)
+      - [Platform Device \& Platform Driver 매칭 메커니즘](#platform-device--platform-driver-매칭-메커니즘)
+        - [1. 전체 바인딩 시퀀스 (Binding Sequence Lifecycle)](#1-전체-바인딩-시퀀스-binding-sequence-lifecycle)
+        - [2. `of_match_table`과 `MODULE_DEVICE_TABLE`](#2-of_match_table과-module_device_table)
+        - [3. `struct platform_driver` 구조체와 핵심 멤버](#3-struct-platform_driver-구조체와-핵심-멤버)
+        - [4. 커널 핵심 파싱 API 및 실전 드라이버 코드](#4-커널-핵심-파싱-api-및-실전-드라이버-코드)
+      - [Device Tree Overlay (DTO) 완벽 가이드](#device-tree-overlay-dto-완벽-가이드)
+        - [1. DTO의 개념과 필요성](#1-dto의-개념과-필요성)
+        - [2. 핵심 원리 및 커널 링킹 메커니즘](#2-핵심-원리-및-커널-링킹-메커니즘)
+        - [3. DTSO 문법 (Modern Syntax)](#3-dtso-문법-modern-syntax)
+        - [4. 런타임 DTO 적용 및 해제 (ConfigFS)](#4-런타임-dto-적용-및-해제-configfs)
+  - [커널 인터럽트 \& 블로킹 I/O (Interrupt \& Blocking I/O)](#커널-인터럽트--블로킹-io-interrupt--blocking-io)
     - [커널 인터럽트 처리 체계와 Top/Bottom Half 개념](#커널-인터럽트-처리-체계와-topbottom-half-개념)
     - [대기 큐(Wait Queue)와 블로킹 I/O (Blocking I/O)](#대기-큐wait-queue와-블로킹-io-blocking-io)
       - [태스크 대기 상태 (Waiting Task States)](#태스크-대기-상태-waiting-task-states)
@@ -105,81 +124,34 @@
       - [인터럽트 등록 및 해제 API (`<linux/interrupt.h>`)](#인터럽트-등록-및-해제-api-linuxinterrupth)
       - [ISR 시그니처 및 반환값 (`irqreturn_t`)](#isr-시그니처-및-반환값-irqreturn_t)
       - [인터럽트 컨텍스트 4대 절대 금기 수칙](#인터럽트-컨텍스트-4대-절대-금기-수칙)
-    - [Top Half vs Bottom Half 메커니즘 비교](#top-half-vs-bottom-half-메커니즘-비교)
+    - [Bottom Half 4대 메커니즘 비교 및 상세 (Workqueue, Threaded IRQ, Softirq, Tasklet)](#bottom-half-4대-메커니즘-비교-및-상세-workqueue-threaded-irq-softirq-tasklet)
       - [실행 환경 및 동작 특성 비교](#실행-환경-및-동작-특성-비교)
-      - [Bottom Half 4대 메커니즘 비교](#bottom-half-4대-메커니즘-비교)
-    - [Bottom Half 지연 처리 기법 4종 상세](#bottom-half-지연-처리-기법-4종-상세)
-      - [Workqueue (워크큐)](#workqueue-워크큐)
-      - [Threaded IRQ (스레드화된 IRQ)](#threaded-irq-스레드화된-irq)
-      - [Softirq (소프트 인터럽트)](#softirq-소프트-인터럽트)
-      - [Tasklet (태스크릿)](#tasklet-태스크릿)
+      - [1. Workqueue (워크큐)](#1-workqueue-워크큐)
+      - [2. Threaded IRQ (스레드화된 IRQ)](#2-threaded-irq-스레드화된-irq)
+      - [3. Softirq (소프트 인터럽트)](#3-softirq-소프트-인터럽트)
+      - [4. Tasklet (태스크릿)](#4-tasklet-태스크릿)
     - [GPIO 인터럽트 및 블로킹 I/O 드라이버 구현 종합 패턴](#gpio-인터럽트-및-블로킹-io-드라이버-구현-종합-패턴)
-  - [커널 동시성 \& 동기화 제어 (Mutex \& Concurrency)](#커널-동시성--동기화-제어-mutex--concurrency)
-    - [Race Condition](#race-condition)
-    - [커널 뮤텍스 (Kernel Mutex)](#커널-뮤텍스-kernel-mutex)
-    - [Spinlock](#spinlock)
+  - [커널 동시성 \& 동기화 제어 (Concurrency \& Synchronization)](#커널-동시성--동기화-제어-concurrency--synchronization)
+    - [Race Condition 및 임계 영역 (Critical Section)](#race-condition-및-임계-영역-critical-section)
     - [원자적 연산 (`atomic_t`)](#원자적-연산-atomic_t)
+    - [Spinlock vs Kernel Mutex (상호 배제)](#spinlock-vs-kernel-mutex-상호-배제)
+      - [커널 뮤텍스 (Kernel Mutex)](#커널-뮤텍스-kernel-mutex)
+      - [Spinlock](#spinlock)
+    - [Completion (경쟁 상태 완화를 위한 동기화)](#completion-경쟁-상태-완화를-위한-동기화)
     - [커널 스레드 (kernel thread, kthread)](#커널-스레드-kernel-thread-kthread)
-      - [커널 스레드의 특징 및 개념](#커널-스레드의-특징-및-개념)
-      - [핵심 API 및 생명주기 (`<linux/kthread.h>`)](#핵심-api-및-생명주기-linuxkthreadh)
-      - [kthread Priority Set (우선순위 및 스케줄링 설정)](#kthread-priority-set-우선순위-및-스케줄링-설정)
+      - [커널 스레드의 특징 및 핵심 API](#커널-스레드의-특징-및-핵심-api)
+      - [kthread Priority Set (Nice값, RT 우선순위 설정)](#kthread-priority-set-nice값-rt-우선순위-설정)
         - [1) Nice 값 설정 (CFS / `SCHED_NORMAL`)](#1-nice-값-설정-cfs--sched_normal)
         - [2) Real-Time (RT) 우선순위 설정 (`SCHED_FIFO` / `SCHED_RR`)](#2-real-time-rt-우선순위-설정-sched_fifo--sched_rr)
-      - [Multiple kthread (다중 커널 스레드 구성 및 관리)](#multiple-kthread-다중-커널-스레드-구성-및-관리)
-        - [1) 다중 스레드 배열 관리 및 CPU Affinity 바인딩](#1-다중-스레드-배열-관리-및-cpu-affinity-바인딩)
-        - [2) 다중 스레드 동기화 기법](#2-다중-스레드-동기화-기법)
-        - [3) kthread vs Workqueue 비교 선택 가이드](#3-kthread-vs-workqueue-비교-선택-가이드)
-    - [File Permission](#file-permission)
-      - [Linux Capability system](#linux-capability-system)
-    - [DMA engine, asyncronous memory transfer](#dma-engine-asyncronous-memory-transfer)
-      - [DMA 전송 유형](#dma-전송-유형)
-      - [DMA 메모리 할당](#dma-메모리-할당)
-    - [mmap](#mmap)
-      - [mmap의 동작 원리](#mmap의-동작-원리)
-      - [mmap의 활용 사례](#mmap의-활용-사례)
-  - [Linux Device Tree 및 커널 드라이버 연동](#linux-device-tree-및-커널-드라이버-연동)
-    - [1. Device Tree 기본 개념 및 도입 배경](#1-device-tree-기본-개념-및-도입-배경)
-      - [1.1 도입 배경 (Board File 방식의 한계와 패러다임 전환)](#11-도입-배경-board-file-방식의-한계와-패러다임-전환)
-      - [1.2 핵심 용어 및 컴파일 체계](#12-핵심-용어-및-컴파일-체계)
-      - [1.3 기본 DTS 문법 및 노드 구조](#13-기본-dts-문법-및-노드-구조)
-        - [1 노드 및 속성 명명 규칙](#1-노드-및-속성-명명-규칙)
-        - [2 프로퍼티(Property) 데이터 타입](#2-프로퍼티property-데이터-타입)
-        - [3 핵심 공통 표준 속성](#3-핵심-공통-표준-속성)
-    - [2. Device Tree 세부 문법 (DTS Syntax Details)](#2-device-tree-세부-문법-dts-syntax-details)
-      - [2.1 `reg` 속성과 주소 지정 모델 (`#address-cells`, `#size-cells`)](#21-reg-속성과-주소-지정-모델-address-cells-size-cells)
-        - [주소 셀 상속 규칙](#주소-셀-상속-규칙)
-        - [버스 유형별 `reg` 속성의 의미](#버스-유형별-reg-속성의-의미)
-        - [다중 레지스터 뱅크](#다중-레지스터-뱅크)
-      - [2.2 `interrupts` 속성과 인터럽트 컨트롤러 (Interrupt Architecture)](#22-interrupts-속성과-인터럽트-컨트롤러-interrupt-architecture)
-        - [핵심 속성 정의](#핵심-속성-정의)
-        - [ARM Generic Interrupt Controller (GIC)의 3셀 규격 상세](#arm-generic-interrupt-controller-gic의-3셀-규격-상세)
-      - [2.3 `ranges`와 버스 브리지 (Bus Bridge \& Address Translation)](#23-ranges와-버스-브리지-bus-bridge--address-translation)
-        - [버스 브리지 노드(Bus Bridge Node)란?](#버스-브리지-노드bus-bridge-node란)
-        - [`ranges` 속성 문법](#ranges-속성-문법)
-        - [1 1:1 매핑 (Identity Mapping)](#1-11-매핑-identity-mapping)
-        - [2 주소 변환 매핑 (Translation Mapping)](#2-주소-변환-매핑-translation-mapping)
-      - [2.4 핵심 표준 노드 (Standard Well-Known Nodes)](#24-핵심-표준-노드-standard-well-known-nodes)
-    - [3. Driver와의 연결 메커니즘 (Device Tree to Driver Binding)](#3-driver와의-연결-메커니즘-device-tree-to-driver-binding)
-      - [3.1 전체 바인딩 시퀀스 (Binding Sequence Lifecycle)](#31-전체-바인딩-시퀀스-binding-sequence-lifecycle)
-      - [3.2 `of_match_table`과 `MODULE_DEVICE_TABLE`](#32-of_match_table과-module_device_table)
-      - [3.3 `struct platform_driver` 구조체와 핵심 멤버](#33-struct-platform_driver-구조체와-핵심-멤버)
-        - [1 라이프사이클 및 제어 콜백 함수](#1-라이프사이클-및-제어-콜백-함수)
-        - [2 `driver` (`struct device_driver`) 공통 메타데이터](#2-driver-struct-device_driver-공통-메타데이터)
-        - [3 기타 플랫폼 특화 멤버](#3-기타-플랫폼-특화-멤버)
-        - [4 등록 및 해제 편의 매크로](#4-등록-및-해제-편의-매크로)
-      - [3.4 커널 핵심 파싱 API 및 실전 드라이버 코드](#34-커널-핵심-파싱-api-및-실전-드라이버-코드)
-        - [1 필수 OF \& 플랫폼 API 명세](#1-필수-of--플랫폼-api-명세)
-        - [2 실전 예제: DTS 노드와 드라이버 `probe` 구현](#2-실전-예제-dts-노드와-드라이버-probe-구현)
-    - [4. Device Tree Overlay (DTO) 완벽 가이드](#4-device-tree-overlay-dto-완벽-가이드)
-      - [4.1 DTO의 개념과 필요성](#41-dto의-개념과-필요성)
-      - [4.2 핵심 원리 및 커널 링킹 메커니즘](#42-핵심-원리-및-커널-링킹-메커니즘)
-        - [4.3 DTSO 문법과 실전 작성법](#43-dtso-문법과-실전-작성법)
-          - [1 클래식 Fragment 문법 (Legacy / Standard)](#1-클래식-fragment-문법-legacy--standard)
-          - [2 최신 신택틱 슈가 문법 (Modern DTC Syntax)](#2-최신-신택틱-슈가-문법-modern-dtc-syntax)
-        - [4.4 런타임 DTO 적용 및 해제 실무 (ConfigFS)](#44-런타임-dto-적용-및-해제-실무-configfs)
-          - [컴파일](#컴파일)
-          - [런타임 적용 (Loading)](#런타임-적용-loading)
-          - [런타임 해제 (Unloading / Hot-Unplug)](#런타임-해제-unloading--hot-unplug)
+      - [Multiple kthread 구성 및 관리 (Affinity, 동기화, Workqueue 비교)](#multiple-kthread-구성-및-관리-affinity-동기화-workqueue-비교)
+  - [커널 메모리 관리 \& 고급 I/O 기법 (Kernel Memory \& High-Performance I/O)](#커널-메모리-관리--고급-io-기법-kernel-memory--high-performance-io)
+    - [커널 동적 메모리 할당 (`kmalloc`, `vmalloc`, `kmem_cache`)](#커널-동적-메모리-할당-kmalloc-vmalloc-kmem_cache)
+    - [Memory Mapping (`mmap`)](#memory-mapping-mmap)
+      - [`mmap`의 동작 원리 및 주소 공간 매핑](#mmap의-동작-원리-및-주소-공간-매핑)
+      - [드라이버에서의 `nopage`/`fault` 핸들러 구현](#드라이버에서의-nopagefault-핸들러-구현)
+    - [DMA Engine \& Asynchronous Memory Transfer](#dma-engine--asynchronous-memory-transfer)
+      - [DMA 전송 유형 (Consistent vs Streaming)](#dma-전송-유형-consistent-vs-streaming)
+      - [DMA 메모리 할당 및 캐시 일관성 (Cache Coherency)](#dma-메모리-할당-및-캐시-일관성-cache-coherency)
 - [3. 컴퓨터 과학 배경지식 (Computer Science Basic)](#3-컴퓨터-과학-배경지식-computer-science-basic)
   - [프로세스 \& 스레드 이론 (Process \& Thread Theory)](#프로세스--스레드-이론-process--thread-theory)
     - [프로세스와 스레드의 자원 격리 및 공유 모델](#프로세스와-스레드의-자원-격리-및-공유-모델)
@@ -208,7 +180,6 @@
     - [인터럽트 분할 처리 (Top-Half \& Bottom-Half) 원리](#인터럽트-분할-처리-top-half--bottom-half-원리)
     - [I/O 모델 비교](#io-모델-비교)
   - [운영체제 커널 구조 이론 (OS Kernel Architecture Theory)](#운영체제-커널-구조-이론-os-kernel-architecture-theory)
-  - [FPGA 개념](#fpga-개념)
 ---
 
 # 1. Linux basic & Application Programming
@@ -700,7 +671,9 @@ module_exit(my_module_exit);
 
 ---
 
-### Kernel Module Parameters
+### Kernel Module Parameters & Dependencies
+
+#### Kernel Module Parameters
 `insmod` 또는 `modprobe` 시점에 모듈에 파라미터를 전달하여 런타임에 모듈의 동작(디버그 레벨, 하드웨어 설정 등)을 변경할 수 있습니다
 
 ```c
@@ -717,15 +690,10 @@ module_param_named(name, device_name, charp, 0444);
 - **권한 비트 (Permission)**: `0644` 지정 시 `/sys/module/<modulename>/parameters/debug_level` 가상 파일이 생성되어 유저 공간에서 조회 및 수정 가능 (`0`으로 지정 시 sysfs 파일 미생성)
 - **자동 파라미터 전달**: `/etc/modprobe.d/mymodule.conf` 파일에 `options mymodule debug_level=5` 형태로 기술
 
----
-
-### Kernel Module Dependency & Symbol Export
-
-#### 커널 심볼 (Kernel Symbol)
+#### 커널 심볼 (Kernel Symbol) 및 EXPORT_SYMBOL
 커널 또는 타 모듈이 내보내어(Export) 외부 모듈에서 참조할 수 있는 함수나 전역 변수의 식별자 주소
 - **전체 심볼 목록 확인**: 빌드 결과물 `System.map` 또는 런타임 파일 `/proc/kallsyms` 조회를 통해 확인 가능
 
-#### 심볼 내보내기 매크로
 ```c
 int my_shared_func(void) { return 0; }
 EXPORT_SYMBOL(my_shared_func);     // 모든 라이선스의 모듈에게 공개
@@ -734,7 +702,7 @@ int my_gpl_func(void) { return 0; }
 EXPORT_SYMBOL_GPL(my_gpl_func); // GPL 라이선스 모듈에만 공개
 ```
 
-#### `/lib/modules/$(uname -r)/` 의존성 관련 파일
+#### `/lib/modules/$(uname -r)/` 의존성 파일
 - `modules.dep` / `modules.dep.bin`: 모듈 간의 의존성 관계 텍스트 및 바이너리 DB
 - `modules.symbols` / `modules.symbols.bin`: 심볼과 이를 소유한 모듈 매핑 정보
 - `modules.alias` / `modules.alias.bin`: 디바이스 ID와 모듈의 별칭 매핑
@@ -742,9 +710,9 @@ EXPORT_SYMBOL_GPL(my_gpl_func); // GPL 라이선스 모듈에만 공개
 
 ---
 
-### Kernel Module License & Safety Rules
+### Kernel Module License, Safety Rules & Security
 
-#### 라이선스 (License) 및 Tainted Kernel
+#### 라이선스 및 Tainted Kernel
 - **General Public License (GPL)**: 코드 배포 시 소스 코드 공개 의무 발생 (단, 배포하지 않고 내부만 사용 시 미공개 가능)
 - `MODULE_LICENSE("GPL")`: 커널의 핵심 함수(`printk`, `ioremap` 등) 및 `EXPORT_SYMBOL_GPL`로 내보낸 심볼을 사용하려면 필수
 - **Tainted Flag**: Non-GPL 또는 Proprietary 모듈 적재 시 커널에 Tainted(오염) 플래그가 설정되며, 이 상태에서 발생하는 버그 커널 리포트는 커널 커뮤니티에서 무시될 수 있음
@@ -754,6 +722,17 @@ EXPORT_SYMBOL_GPL(my_gpl_func); // GPL 라이선스 모듈에만 공개
 2. **Init / Exit 리소스 symmetry (대칭성)**: `init`에서 할당한 자원(메모리, IRQ, I/O 맵핑 등)은 `exit`에서 무조건 대칭적으로 해제해야 함. 해제 누수 발생 시 재부팅 전까지 커널 메모리가 상실됨
 3. **부동 소수점 (Float Point) 연산 엄금**: 커널 공간에서는 FPU(Float Point Unit) 레지스터 컨텍스트 스위칭 비용으로 인해 기본적으로 부동 소수점 연산이 금지됨
 
+#### Linux Capability System & 권한 제어
+디바이스 드라이버 파일에도 적용되는 파일 권한의 값 (`0brwxrwxrwx` or `0[root][group][other]`).
+Linux Capability system은 root 권한을 세분화된 단위로 분리합니다. 드라이버 작성자에 의해 특정 권한 레벨에 대한 특정 파일 입출력을 추가적으로 제한 또는 구현할 수 있습니다.
+
+*driver level Permission check*
+- `capable(CAP_SYS_ADMIN)`
+
+**에러 코드의 차이**
+- `-EPERM`  : 프로세스의 Capability/권한이 부족할 때
+- `-EACCES`: 파일 접근 모드가 맞지 않을 때
+
 ---
 
 ### Kernel Debugging Tools & Log Levels (printk, dmesg)
@@ -762,7 +741,7 @@ EXPORT_SYMBOL_GPL(my_gpl_func); // GPL 라이선스 모듈에만 공개
 커널 공간에서는 표준 C 라이브러리의 `printf`를 사용할 수 없으며 `printk()`를 사용합니다
 - `#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt`를 파일 상단에 정의하면 `pr_info()`, `pr_err()` 출력 시 자동으로 모듈 이름 접두사가 추가됩니다
 
-#### 커널 로그 레벨 (8단계)
+#### 커널 로그 레벨 (8단계) 및 콘솔 제어
 | Level | Macro          | 설명                        | 용도                  |
 | :---: | :------------- | :-------------------------- | :-------------------- |
 | **0** | `KERN_EMERG`   | 시스템을 사용할 수 없음     | 커널 패닉 직전 메세지 |
@@ -774,7 +753,7 @@ EXPORT_SYMBOL_GPL(my_gpl_func); // GPL 라이선스 모듈에만 공개
 | **6** | `KERN_INFO`    | 일반 정보 메세지            | 모듈 로드 성공 정보   |
 | **7** | `KERN_DEBUG`   | 디버그 메세지               | 개발 상세 로그        |
 
-#### 콘솔 로그 레벨 제어 (`/proc/sys/kernel/printk`)
+**콘솔 로그 레벨 제어 (`/proc/sys/kernel/printk`)**:
 `cat /proc/sys/kernel/printk` 실행 시 출력되는 4개 숫자 예시: `4  4  1  7`
 1. `console_loglevel` (4): 이 값보다 **우선순위가 높은(숫자가 작은 0~3) 로그만 실제 터미널 콘솔에 출력**됨
 2. `default_message_loglevel` (4): 로그 레벨이 명시되지 않은 `printk`에 부여되는 기본 로그 레벨
@@ -793,7 +772,7 @@ EXPORT_SYMBOL_GPL(my_gpl_func); // GPL 라이선스 모듈에만 공개
 +-------------------------------------------------------+
 |             User Space Application                    |
 +-------------------------------------------------------+
-								│ System Call (open, read, write, ioctl) 
+                 │ System Call (open, read, write, ioctl) 
 +-------------------------------------------------------+
 |             Driver Subsystem (VFS / cdev)             |
 +-------------------------------------------------------+
@@ -823,12 +802,11 @@ EXPORT_SYMBOL_GPL(my_gpl_func); // GPL 라이선스 모듈에만 공개
 | **주요 인터페이스** | `struct file_operations`      | `block_device_operations`   | `struct net_device_ops`             |
 | **대표 예시**       | UART, GPIO, I2C/SPI 센서, RTC | NVMe SSD, SATA HDD, SD/eMMC | Ethernet (NIC), Wi-Fi               |
 
-#### Device Number (디바이스 번호)
+#### Device Number 생성 및 동적 주번호 할당 API
 커널은 드라이버를 식별하기 위해 32-bit `dev_t` 구조의 번호를 사용합니다:
 - **Major Number (주번호, 상위 12-bit)**: 해당 디바이스 드라이버의 종류를 식별
 - **Minor Number (부번호, 하위 20-bit)**: 동일한 드라이버가 제어하는 개별 하드웨어 인스턴스를 식별
 
-#### 동적 주번호 할당 API
 ```c
 dev_t dev_id;
 // dev_id 동적 할당 (첫 부번호 0, 요청 개수 1개, 디바이스 이름)
@@ -842,7 +820,16 @@ unregister_chrdev_region(dev_id, 1);
 
 ---
 
-### Memory Mapping (`ioremap`)
+### Address Spaces & Memory Mapping
+
+#### 주소 공간 구분 (32-bit ARM Linux 기준)
+| 주소 종류                  | 주소 범위                 | 접근 주체     | 설명                                                       |
+| :------------------------- | :------------------------ | :------------ | :--------------------------------------------------------- |
+| **Physical Address**       | `0x00000000 ~ 0xFFFFFFFF` | 하드웨어 버스 | SoC 데이터시트에 명시된 실제 물리 레지스터/DRAM 주소       |
+| **Kernel Virtual Address** | `0xC0000000 ~ 0xFFFFFFFF` | 커널 코드     | MMU가 맵핑한 커널 전용 가상 주소 공간 (전체 프로세스 공유) |
+| **User Virtual Address**   | `0x00000000 ~ 0xBFFFFFFF` | 유저 프로세스 | 각 프로세스별로 독립적인 유저 가상 주소 공간               |
+
+#### I/O Memory Mapping (`ioremap`)
 임베디드 하드웨어 제어 시 SoC 레지스터의 물리 메모리 주소(Physical Address)에 직접 접근할 수 없으므로, 커널 가상 주소로 매핑해야 합니다
 
 ```c
@@ -856,21 +843,11 @@ void iounmap(volatile void __iomem *addr);
   - `readb()`, `readw()`, `readl()` (8-bit, 16-bit, 32-bit 읽기)
   - `writeb()`, `writew()`, `writel()` (8-bit, 16-bit, 32-bit 쓰기)
 
----
-
-### Address Spaces & User/Kernel Data Exchange
-
-#### 주소 공간 구분 (32-bit ARM Linux 기준)
-| 주소 종류                  | 주소 범위                 | 접근 주체     | 설명                                                       |
-| :------------------------- | :------------------------ | :------------ | :--------------------------------------------------------- |
-| **Physical Address**       | `0x00000000 ~ 0xFFFFFFFF` | 하드웨어 버스 | SoC 데이터시트에 명시된 실제 물리 레지스터/DRAM 주소       |
-| **Kernel Virtual Address** | `0xC0000000 ~ 0xFFFFFFFF` | 커널 코드     | MMU가 맵핑한 커널 전용 가상 주소 공간 (전체 프로세스 공유) |
-| **User Virtual Address**   | `0x00000000 ~ 0xBFFFFFFF` | 유저 프로세스 | 각 프로세스별로 독립적인 유저 가상 주소 공간               |
-
-#### 유저-커널 간 안전한 데이터 교환
+#### 유저-커널 간 안전한 데이터 교환 (`copy_to_user`, `copy_from_user`)
 유저 프로세스가 전달한 포인터 주소를 디바이스 드라이버가 커널 공간에서 **직접 역참조(`*ptr`)하는 것은 엄격히 금지**됩니다
 - 유저 가상 주소는 페이지 스왑아웃이나 지연 할당(Lazy Alloc) 상태일 수 있으며, 잘못된 유저 주소 접근 시 시스템 전체 커널 패닉을 일으키거나 보안 취약점이 발생합니다
 - 반드시 전용 안전 복사 함수를 사용해야 합니다:
+
 ```c
 #include <linux/uaccess.h>
 
@@ -925,10 +902,8 @@ int ret = cdev_add(&my_cdev, dev_id, 1);
 cdev_del(&my_cdev);
 ```
 
----
-
-#### udev
-udev는 디바이스 관리 daemon이다. 디바이스를 관리하면 uevent를 발생시키고 udev가 수신하여 /dev/ 노드의 속성을 조정한다.
+#### udev / devtmpfs (자동 디바이스 노드 생성)
+udev는 디바이스 관리 daemon이다. 디바이스를 관리하면 uevent를 발생시키고 udev가 수신하여 `/dev/` 노드의 속성을 조정한다.
 
 **자동으로 디바이스 드라이버 파일 생성 및 설정**
 `/etc/udev/rules.d/<priority_number>-<device_name>.rules` 설정 예시:
@@ -996,26 +971,414 @@ static long my_driver_ioctl(struct file *file, unsigned int cmd, unsigned long a
 
 ---
 
-### GPIO Subsystem
+### GPIO Subsystem & Hardware Control
 하드웨어 Pin 레지스터 주소와 Bit Mask를 디바이스 드라이버가 직접 제어하지 않고, 커널이 제공하는 추상화 계층을 통해 GPIO 제어를 수행하는 서브시스템
 - **레거시 sysfs 방식**: `/sys/class/gpio/export`에 Pin 번호를 써서 개방 후 `/sys/class/gpio/gpioX/direction` 및 `value` 제어
 - **현대적 gpiod 방식**: Device Tree의 node 정보를 기반으로 커널 gpiod API (`gpiod_get()`, `gpiod_direction_output()`, `gpiod_set_value()`)를 사용하여 하드웨어 의존성을 분리
 
 ---
 
-## 커널 동적 메모리 할당 (Kernel Dynamic Memory Allocation)
-커널 내부에서 메모리를 동적으로 할당할 때 목적에 맞춰 아래의 할당자를 선택합니다
+### Device Tree & Platform Driver
 
-| 구분                | `kmalloc()`                             | `vmalloc()`                                     | SLAB / SLUB Allocator                                   |
-| :------------------ | :-------------------------------------- | :---------------------------------------------- | :------------------------------------------------------ |
-| **메모리 연속성**   | **물리적 & 가상으로 모두 연속**         | **가상 메모리만 연속** (물리적으로 불연속 가능) | 객체 단위 연속 할당                                     |
-| **할당 크기**       | 작은 크기 (보통 4KB ~ 128KB 이하)       | 대용량 메모리 할당에 적합                       | 자주 사용되는 특정 구조체 크기                          |
-| **속도 / 오버헤드** | 매우 빠름 (DMA 접근 가능)               | 상대적으로 느림 (페이지 테이블 재구성 오버헤드) | 매우 빠름 (객체 재사용 캐싱)                            |
-| **주요 용도**       | 하드웨어 I/O 버퍼, 드라이버 소형 구조체 | 대형 소프트웨어 버퍼, 커널 모듈 코드 로딩       | `struct task_struct`, `struct file` 등 커널 구조체 캐시 |
+#### Device Tree 구조 및 노드 파싱 (DTS/DTB)
+
+##### 1. Device Tree 기본 개념 및 도입 배경
+- **레거시 Board File 방식 (`arch/arm/mach-*`)의 문제점**:
+  - 임베디드 리눅스 초기에는 각 보드의 하드웨어 정보(UART 베이스 주소, IRQ 번호, GPIO 핀 매핑, I2C/SPI 슬레이브 주소 등)가 C 소스 파일(`board-*.c`) 형태로 커널 소스 트리에 직접 하드코딩되었습니다.
+  - **커널 소스 오염 (Kernel Bloat)**: 새로운 보드와 SoC가 출시될 때마다 수천 줄의 중복된 보드 파일이 커널 소스에 추가되어 유지보수가 불가능할 정도로 비대해짐 (2011년 Linus Torvalds의 *"ARM 커널 소스는 쓰레기장 같다"*는 유명한 비판 계기).
+  - **단일 커널 이미지(Single Kernel Image) 불가**: 동일한 SoC라도 메모리 맵이나 주변장치 구성이 조금만 다르면 커널 바이너리 자체를 따로 빌드해야 함.
+  - **유지보수 비용 폭증**: 사소한 하드웨어 변경(핀 번호, IRQ 등)에도 전체 커널을 재컴파일하고 재배포해야 하는 문제.
+
+- **Device Tree의 해결책과 의의**:
+  - **하드웨어 명세와 커널 코드의 완전한 분리**: 하드웨어 명세는 독립적인 텍스트 파일(DTS)로 분리하고, 커널 바이너리(`zImage`/`Image`)는 순수한 실행 로직만 담당.
+  - **단일 바이너리 재사용 (Single Kernel Image)**: 동일한 커널 바이너리로 부팅하되, 부트로더가 타깃 보드에 맞는 컴파일된 디바이스 트리(`*.dtb`)를 메모리에 로드하여 커널에 전달하면 커널이 런타임에 동적으로 하드웨어 구조를 파싱.
+  - **신속한 보드 포팅 및 유지보수**: 하드웨어 변경 시 커널을 재빌드하지 않고 DTS 파일 수정 및 DTB 컴파일만으로 즉시 적용 가능.
+
+```mermaid
+flowchart TD
+    subgraph Legacy ["과거 Board File 방식"]
+        BF["하드웨어 하드코딩<br>(board-omap.c, board-smdk.c)"] -->|"함께 컴파일"| KB["보드별 전용 커널 바이너리<br>(vmlinuz_boardA, vmlinuz_boardB)"]
+    end
+
+    subgraph Modern ["현대 Device Tree 방식"]
+        DTS1["DTS / DTSI<br>(보드 A 명세)"] -->|DTC 컴파일| DTB1["DTB 바이너리 (보드 A)"]
+        DTS2["DTS / DTSI<br>(보드 B 명세)"] -->|DTC 컴파일| DTB2["DTB 바이너리 (보드 B)"]
+        GenericKernel["단일 범용 커널 바이너리<br>(zImage / Image)"]
+        
+        DTB1 --> Bootloader1["부트로더 (U-Boot)"]
+        GenericKernel --> Bootloader1
+        Bootloader1 -->|"런타임 파싱 (동적 구성)"| RunningKernel1["실행 중인 리눅스 커널"]
+    end
+```
+
+##### 2. 핵심 용어 및 컴파일 체계
+| 용어       | 풀네임 (Full Name)                                | 설명 및 역할                                                                                                                                  |
+| :--------- | :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------- |
+| **DTS**    | **Device Tree Source**                            | 사람이 읽고 편집할 수 있는 텍스트 형태의 하드웨어 기술 소스 파일 (`.dts`). 최상위 보드 파일.                                                  |
+| **DTSI**   | **Device Tree Source Include**                    | 여러 보드나 동일 SoC 계열에서 공통으로 재사용되는 노드 정의를 모아둔 인클루드/헤더 파일 (`.dtsi`). `#include` 또는 `/include/` 구문으로 포함. |
+| **DTB**    | **Device Tree Blob (Flattened Device Tree, FDT)** | DTC 컴파일러를 통해 컴파일된 바이너리 형태의 디바이스 트리 파일 (`.dtb`). 부트로더가 DRAM에 적재 후 커널에 메모리 주소를 전달.                |
+| **DTC**    | **Device Tree Compiler**                          | 텍스트 파일인 DTS를 바이너리 DTB로 변환(또는 역변환 디컴파일 `dtb -> dts`)하는 전용 컴파일러 도구.                                            |
+| **OF API** | **Open Firmware API**                             | PowerPC Open Firmware 규격에서 유래한 리눅스 커널 내부의 디바이스 트리 파싱 및 노드 탐색 함수군 (`of_property_read_*`, `of_find_node_*` 등).  |
+
+##### 3. 기본 DTS 문법 및 노드 구조
+디바이스 트리는 루트 노드(`/`)를 시작점으로 하는 계층적 트리 구조(Tree Structure)를 가집니다.
+
+```dts
+/dts-v1/; // DTS 버전 선언 (필수)
+
+// 1. 공통 헤더/SoC 정의 인클루드
+#include "zynq-7000.dtsi"
+
+// 2. 루트 노드 (Root Node)
+/ {
+    model = "Xilinx Zynq ZED Board"; // 보드 식별 명칭
+    compatible = "xlnx,zynq-zed", "xlnx,zynq-7000"; // 최상위 호환성 문자열
+
+    #address-cells = <1>;
+    #size-cells = <1>;
+
+    // 3. 자식 노드 정의: [label:] node-name[@unit-address]
+    aliases {
+        serial0 = &uart1;
+    };
+
+    memory@0 {
+        device_type = "memory";
+        reg = <0x00000000 0x20000000>; // 512MB RAM
+    };
+
+    chosen {
+        bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw earlyprintk";
+        stdout-path = "serial0:115200n8";
+    };
+
+    soc {
+        #address-cells = <1>;
+        #size-cells = <1>;
+        compatible = "simple-bus";
+        ranges;
+
+        my_led: gpio-leds@41200000 {
+            compatible = "vendor,custom-led-1.0";
+            reg = <0x41200000 0x1000>;
+            status = "okay";
+        };
+    };
+};
+```
+
+###### 노드 및 속성 명명 규칙
+- **노드 명명 형식**: `[레이블:] 노드이름[@단위주소]`
+  - `label:`: 타 노드에서 이 노드를 직접 참조(phandle)하기 위한 식별자 (예: `&my_led`).
+  - `node-name`: 소문자 알파벳으로 시작하는 장치 유형 (예: `serial`, `ethernet`, `timer`).
+  - `@unit-address`: 장치의 기본 물리 시작 주소 또는 채널 번호 (해당 노드의 `reg` 첫 번째 값과 일치해야 함).
+  - *형제 노드(Sibling Nodes) 간에는 이름이 유일해야 하지만, 단위 주소가 다르면 동일 노드 이름 사용 가능.*
+
+###### 프로퍼티(Property) 데이터 타입
+디바이스 트리의 속성값은 바이트, 정수, 문자열, 빈 속성 등으로 표현됩니다.
+| 데이터 타입                   | 문법 표현               | 설명 및 예시                                                                       |
+| :---------------------------- | :---------------------- | :--------------------------------------------------------------------------------- |
+| **32-bit Cell (정수)**        | `<0x1000 42>`           | 꺾쇠괄호 `< >` 안에 32비트 부호 없는 정수(빅엔디안)를 공백으로 나열.               |
+| **String (문자열)**           | `"okay"`                | 큰따옴표 `" "`로 묶은 NULL 종료 ASCII 문자열.                                      |
+| **String List (문자열 목록)** | `"ns16550a", "ns16550"` | 쉼표로 구분된 문자열 배열 (우선순위 순 드라이버 매칭).                             |
+| **Byte String (바이트 배열)** | `[00 11 22 33 AA BB]`   | 대괄호 `[ ]` 안에 16진수 바이트를 2자리씩 공백으로 나열 (주로 MAC 주소 등에 사용). |
+| **Empty / Boolean (플래그)**  | `empty-property;`       | 값이 없는 속성. 속성의 존재 여부 자체가 `true` / `false`를 의미.                   |
+| **phandle (노드 참조)**       | `<&uart0>`              | 꺾쇠 안에 `&레이블` 형태로 타 노드를 가리킴. DTC 컴파일 시 고유 정수 ID로 치환.    |
+
+###### 핵심 공통 표준 속성
+- **`compatible`**: 디바이스 노드와 리눅스 커널 드라이버를 연결하는 **가장 핵심적인 키(Key)**. `"제조사,모델명"` 형식.
+- **`status`**: 하드웨어 활성화 상태 (`"okay"`: 정상 활성화, `"disabled"`: 사용 안 함 / 드라이버 probe 방지).
+- **`phandle`**: 노드 간 상호 연결(인터럽트 컨트롤러 참조, 클럭/GPIO 참조 등)을 위한 내부 32비트 포인터 ID.
+
+##### 4. `reg` 속성과 주소 지정 모델 (`#address-cells`, `#size-cells`)
+디바이스 노드의 주소와 메모리 매핑 크기는 해당 노드의 부모 버스 노드에 선언된 `#address-cells`와 `#size-cells`에 의해 결정됩니다.
+
+- 자식 노드의 `reg`에 적히는 정수(u32) 셀의 개수는 **부모 노드**의 설정을 따릅니다.
+- `#address-cells`: 디바이스의 시작 주소를 표현하는 32비트 정수(Cell)의 개수
+- `#size-cells`: 디바이스가 점유하는 메모리 크기(Range)를 표현하는 32비트 정수(Cell)의 개수
+
+```dts
+/ {
+    #address-cells = <1>;
+    #size-cells = <1>;
+
+    soc {
+        #address-cells = <1>;
+        #size-cells = <1>;
+        compatible = "simple-bus";
+        ranges;
+
+        // 부모(soc)의 #address-cells = 1, #size-cells = 1 적용
+        // 물리 주소 0x40000000, 크기 0x1000 (4KB)
+        serial@40000000 {
+            compatible = "ns16550a";
+            reg = <0x40000000 0x1000>;
+        };
+    };
+};
+```
+
+| 버스 유형                  | `#address-cells` | `#size-cells` | `reg`의 의미                   | 예시                          |
+| :------------------------- | :--------------: | :-----------: | :----------------------------- | :---------------------------- |
+| **Memory-mapped (MMIO)**   |     1 또는 2     |   1 또는 2    | 시작 물리 메모리 주소 및 크기  | `reg = <0x43C00000 0x10000>;` |
+| **I2C 버스**               |        1         |       0       | I2C 슬레이브 7비트 주소        | `reg = <0x50>;` (EEPROM 주소) |
+| **SPI 버스**               |        1         |       0       | SPI Chip Select (CS) 라인 번호 | `reg = <0>;` (CS 0번 채널)    |
+| **MDIO 버스 (이더넷 PHY)** |        1         |       0       | PHY 주소 (0 ~ 31)              | `reg = <1>;` (PHY ID 1)       |
+
+##### 5. `interrupts` 속성과 인터럽트 컨트롤러 (Interrupt Architecture)
+- `interrupt-controller`: 해당 노드가 인터럽트 신호를 수신하고 중재하는 컨트롤러(IC)임을 선언하는 빈 속성 (Boolean).
+- `#interrupt-cells`: 이 컨트롤러에 연결되는 디바이스 노드가 인터럽트 번호 및 속성을 정의할 때 사용해야 하는 32비트 셀 개수.
+- `interrupt-parent`: 디바이스의 인터럽트 라인이 물리적으로 연결된 인터럽트 컨트롤러 노드를 phandle(`<&label>`)로 지정.
+- `interrupts`: 인터럽트 지정자(Specifier) 리스트.
+
+*ARM GIC 3-Cell Specifier 분석 (`interrupts = <0 32 4>;`):*
+1. **Cell 1**: 인터럽트 타입 (`0`: `GIC_SPI` 공유 주변장치 인터럽트, `1`: `GIC_PPI` 코어 전용 인터럽트)
+2. **Cell 2**: 인터럽트 번호 (SPI: 0 ~ 987, 커널 IRQ = SPI 번호 + 32)
+3. **Cell 3**: 트리거 방식 플래그 (`1`: 상승 에지, `2`: 하강 에지, `4`: 액티브 하이 레벨, `8`: 액티브 로우 레벨)
+
+##### 6. `ranges`와 버스 브리지 (Address Translation)
+```dts
+ranges = <child-bus-address  parent-bus-address  length>;
+```
+- **1:1 매핑 (Identity Mapping)**: `ranges;` (빈 ranges 속성: 자식 버스 주소와 부모 버스 주소가 동일)
+- **주소 변환 매핑 (Translation Mapping)**:
+```dts
+axi_to_local_bridge {
+    compatible = "vendor,local-bus-bridge";
+    #address-cells = <1>;
+    #size-cells = <1>;
+    ranges = <0x00000000 0x80000000 0x00010000>;
+
+    sram@0 {
+        reg = <0x00000000 0x4000>; // 로컬 0x0 -> 실제 CPU 주소는 0x80000000 매핑
+    };
+};
+```
+
+##### 7. 핵심 표준 노드 (Standard Well-Known Nodes)
+- `/`: 루트 노드 (`model`, `compatible`)
+- `/cpus`: 코어 동작 주파수, 캐시 토폴로지, SMP 부팅 방식
+- `/memory`: 물리 RAM 시작 주소 및 크기 (`device_type = "memory"`)
+- `/chosen`: 커널 커맨드라인(`bootargs`), 콘솔 경로(`stdout-path`), 램디스크 주소
+- `/aliases`: 드라이버 인덱스 부여용 별칭 테이블 (`serial0 = &uart0;`)
 
 ---
 
-## 커널 인터럽트 & 블로킹 I/O (GPIO Interrupt & Blocking I/O)
+#### Platform Device & Platform Driver 매칭 메커니즘
+
+##### 1. 전체 바인딩 시퀀스 (Binding Sequence Lifecycle)
+```mermaid
+sequenceDiagram
+    participant Bootloader as 부트로더 (U-Boot)
+    participant KernelInit as 커널 초기화 (Early Setup)
+    participant OFCore as OF Core (of_platform)
+    participant PlatformBus as Platform Bus (Linux Bus Driver)
+    participant Driver as 디바이스 드라이버
+
+    Bootloader->>KernelInit: DTB 물리 주소 포인터 전달
+    KernelInit->>KernelInit: unflatten_device_tree() 호출 (struct device_node 트리 생성)
+    KernelInit->>OFCore: of_platform_default_populate() 호출
+    OFCore->>OFCore: compatible="simple-bus" 등의 자식 노드 순회
+    OFCore->>PlatformBus: struct platform_device 인스턴스 동적 생성 및 등록 (reg, irq -> resource 변환)
+    Driver->>PlatformBus: platform_driver_register() 등록
+    PlatformBus->>PlatformBus: bus_match() -> of_match_device() 수행
+    Note over PlatformBus: DT compatible 문자열 == of_match_table compatible 비교
+    PlatformBus->>Driver: driver->probe(pdev) 호출
+    Driver->>Driver: devm_ioremap_resource(), platform_get_irq() 등으로 HW 제어 시작
+```
+
+1. **DTB 로드 및 언플래트닝**: 부트로더가 DTB를 메모리에 적재 후 커널에 포인터 전달 $\rightarrow$ `unflatten_device_tree()`로 `struct device_node` 트리 구성.
+2. **`platform_device` 동적 생성**: `of_platform_default_populate()`가 `simple-bus` 하위 노드들을 순회하며 `struct platform_device` 생성 (reg/irq를 `struct resource`로 변환).
+3. **매칭 및 `probe()` 호출**: `platform_driver_register()` 시 `of_match_table`의 compatible과 노드의 compatible을 비교하여 일치 시 `.probe()` 호출.
+
+##### 2. `of_match_table`과 `MODULE_DEVICE_TABLE`
+```c
+#include <linux/module.h>
+#include <linux/platform_device.h>
+#include <linux/of.h>
+
+static const struct of_device_id my_driver_dt_ids[] = {
+    { .compatible = "vendor,myip-1.0", },
+    { .compatible = "vendor,myip-2.0", },
+    { /* Sentinel */ }
+};
+MODULE_DEVICE_TABLE(of, my_driver_dt_ids);
+```
+
+##### 3. `struct platform_driver` 구조체와 핵심 멤버
+```c
+struct platform_driver {
+    int (*probe)(struct platform_device *);
+    void (*remove)(struct platform_device *);   // 리눅스 6.11+부터 void 반환
+    void (*shutdown)(struct platform_device *);
+    int (*suspend)(struct platform_device *, pm_message_t state);
+    int (*resume)(struct platform_device *);
+    struct device_driver driver;
+    const struct platform_device_id *id_table;
+    bool prevent_deferred_probe;
+};
+```
+- **`.probe`**: 하드웨어 매칭 시 리소스 획득, `devm_ioremap_resource()`, 인터럽트 등록, `platform_set_drvdata()`.
+- **`.remove`**: 모듈 언로드 시 자원 해제.
+- **`module_platform_driver(my_driver)`**: init/exit 등록 편의 매크로.
+
+##### 4. 커널 핵심 파싱 API 및 실전 드라이버 코드
+```c
+#include <linux/module.h>
+#include <linux/platform_device.h>
+#include <linux/io.h>
+#include <linux/interrupt.h>
+#include <linux/of.h>
+
+struct custom_dev_priv {
+    void __iomem *base;
+    int irq;
+    u32 clk_freq;
+    bool test_mode;
+};
+
+static irqreturn_t custom_dev_irq_handler(int irq, void *dev_id) {
+    return IRQ_HANDLED;
+}
+
+static int custom_dev_probe(struct platform_device *pdev) {
+    struct device *dev = &pdev->dev;
+    struct custom_dev_priv *priv;
+    struct resource *res;
+    int ret;
+
+    dev_info(dev, "Probing custom device...\n");
+
+    priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
+    if (!priv) return -ENOMEM;
+
+    // 1. MMIO 주소 획득 및 매핑
+    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+    priv->base = devm_ioremap_resource(dev, res);
+    if (IS_ERR(priv->base))
+        return PTR_ERR(priv->base);
+
+    // 2. IRQ 획득 및 핸들러 등록
+    priv->irq = platform_get_irq(pdev, 0);
+    if (priv->irq < 0) return priv->irq;
+
+    ret = devm_request_irq(dev, priv->irq, custom_dev_irq_handler,
+                           0, dev_name(dev), priv);
+    if (ret) {
+        dev_err(dev, "Failed to request IRQ %d\n", priv->irq);
+        return ret;
+    }
+
+    // 3. OF 커스텀 속성 파싱
+    ret = of_property_read_u32(dev->of_node, "vendor,clock-freq", &priv->clk_freq);
+    if (ret) priv->clk_freq = 50000000; // 기본값
+
+    priv->test_mode = of_property_read_bool(dev->of_node, "vendor,enable-test-mode");
+
+    platform_set_drvdata(pdev, priv);
+    dev_info(dev, "Successfully initialized at 0x%pK, IRQ %d\n", priv->base, priv->irq);
+    return 0;
+}
+
+static void custom_dev_remove(struct platform_device *pdev) {
+    dev_info(&pdev->dev, "Removing custom device\n");
+}
+
+static const struct of_device_id custom_dev_of_match[] = {
+    { .compatible = "vendor,my-axi-dev", },
+    { /* sentinel */ }
+};
+MODULE_DEVICE_TABLE(of, custom_dev_of_match);
+
+static struct platform_driver custom_dev_driver = {
+    .probe = custom_dev_probe,
+    .remove = custom_dev_remove,
+    .driver = {
+        .name = "custom-axi-dev",
+        .of_match_table = custom_dev_of_match,
+    },
+};
+
+module_platform_driver(custom_dev_driver);
+MODULE_LICENSE("GPL");
+```
+
+---
+
+#### Device Tree Overlay (DTO) 완벽 가이드
+
+##### 1. DTO의 개념과 필요성
+- **기존 DTB의 한계**: 부팅 시점에 커널 메모리에 로드되어 정적으로 고정됩니다.
+- **DTO(Device Tree Overlay)의 목적**: 시스템이 부팅되어 가동 중인 **런타임(Runtime)** 상태에서 하드웨어가 변경되거나 동적으로 추가/제거될 때, 메인 DTB를 수정하지 않고 차분(Overlay Patch) 파일(`.dtbo`)을 동적으로 병합하거나 분리합니다.
+- **주요 활용 분야**:
+  - **FPGA Dynamic Reconfiguration (Zynq / FPGA SoC)**: PL(Programmable Logic)에 새로운 AXI IP 코어를 다운로드할 때 드라이버를 즉시 연결.
+  - **확장 쉴드 / HAT**: Raspberry Pi HAT, BeagleBone Cape 등 확장 커넥터에 새 보드가 장착되었을 때 핀멀티플렉싱(Pinmux) 및 I2C/SPI 버스 장치 활성화.
+
+##### 2. 핵심 원리 및 커널 링킹 메커니즘
+```mermaid
+flowchart TD
+    subgraph Base_DTB["1. Base DTB (컴파일 옵션: -@)"]
+        BaseNodes["Base Nodes"]
+        Symbols["__symbols__ 노드<br>(레이블 문자열 -> phandle 주소 색인)"]
+    end
+
+    subgraph DTBO["2. DTBO (Overlay Blob)"]
+        Fragments["fragment@0 { __overlay__ { ... } }"]
+        Fixups["__fixups__ 노드<br>(외부 레이블 참조 목록)"]
+        LocalFixups["__local_fixups__"]
+    end
+
+    subgraph Runtime_Kernel["3. 리눅스 커널 오버레이 엔진 (of_overlay)"]
+        Resolver["심볼 해석 (Symbol Resolver)<br>__fixups__와 __symbols__ 매핑"]
+        MergeTree["Base Tree에 Overlay 노드 삽입"]
+        Populate["of_platform_populate() 실행<br>새 platform_device 생성"]
+        Probe["드라이버 probe() 호출"]
+    end
+
+    Base_DTB --> Resolver
+    DTBO --> Resolver
+    Resolver --> MergeTree --> Populate --> Probe
+```
+
+1. **Base DTB 심볼 지원 (`dtc -@`)**: DTB 내부에 `__symbols__` 노드가 생성되어 레이블 경로가 보존됨.
+2. **DTBO 링킹 정보 생성 (`__fixups__`)**: 미해결된 외부 참조를 `__fixups__` 노드에 기록.
+3. **런타임 오버레이 적용**: 커널의 `of_resolve_phandles()`가 `__fixups__`와 Base DTB의 `__symbols__`를 매핑 후 트리를 병합하고 `of_platform_populate()`를 통해 드라이버 `probe()` 호출.
+
+##### 3. DTSO 문법 (Modern Syntax)
+```dts
+/dts-v1/;
+/plugin/;
+
+&amba {
+    #address-cells = <1>;
+    #size-cells = <1>;
+
+    my_fpga_timer: timer@43c00000 {
+        compatible = "vendor,my-timer-1.0";
+        reg = <0x43c00000 0x1000>;
+        interrupt-parent = <&gic>;
+        interrupts = <0 30 4>;
+        status = "okay";
+    };
+};
+```
+
+##### 4. 런타임 DTO 적용 및 해제 (ConfigFS)
+```bash
+# 1. 컴파일 (-@ 필수)
+dtc -@ -I dts -O dtb -o my_overlay.dtbo my_overlay.dtso
+
+# 2. 런타임 적용
+mkdir /sys/kernel/config/device-tree/overlays/my_ip_overlay
+cat my_overlay.dtbo > /sys/kernel/config/device-tree/overlays/my_ip_overlay/dtbo
+
+# 3. 런타임 해제 (Hot-Unplug)
+rmdir /sys/kernel/config/device-tree/overlays/my_ip_overlay
+```
+
+---
+
+## 커널 인터럽트 & 블로킹 I/O (Interrupt & Blocking I/O)
 
 ### 커널 인터럽트 처리 체계와 Top/Bottom Half 개념
 임베디드 리눅스에서 GPIO 핀의 입력 상태 변화(Edge/Level)는 인터럽트 컨트롤러(ARM GIC 등)를 거쳐 CPU에 하드웨어 IRQ Exception을 발생시킵니다. 커널의 Generic IRQ 서브시스템은 해당 인터럽트를 디바이스 드라이버에 전달합니다
@@ -1063,8 +1426,6 @@ DECLARE_WAIT_QUEUE_HEAD(my_wait_queue);
 // 또는 런타임 초기화: init_waitqueue_head(&my_dev->wq);
 
 // 1. 유저 프로세스 대기 (Process Context - read/ioctl 등)
-// condition이 참(true)이 될 때까지 TASK_INTERRUPTIBLE 상태로 수면
-// 대기 도중 시그널을 받아 깨어나면 -ERESTARTSYS 반환
 if (wait_event_interruptible(my_wait_queue, condition != 0)) {
     return -ERESTARTSYS;
 }
@@ -1128,7 +1489,7 @@ static irqreturn_t my_gpio_isr(int irq, void *dev_id)
 
 ---
 
-### Top Half vs Bottom Half 메커니즘 비교
+### Bottom Half 4대 메커니즘 비교 및 상세 (Workqueue, Threaded IRQ, Softirq, Tasklet)
 
 #### 실행 환경 및 동작 특성 비교
 | 구분               | 실행 컨텍스트                        | Sleep 가능 여부 | 실행 시점                   | 전형적 작업                                            |
@@ -1139,7 +1500,6 @@ static irqreturn_t my_gpio_isr(int irq, void *dev_id)
 | **Softirq**        | Softirq (인터럽트) 컨텍스트          | **불가**        | ISR 복귀 직전 / ksoftirqd   | 네트워크 패킷 송수신(`NET_RX`/`NET_TX`), 커널 타이머   |
 | **Tasklet**        | Softirq (인터럽트) 컨텍스트          | **불가**        | softirq 처리 시점           | 경량 비수면 지연 처리 (**Deprecated**)                 |
 
-#### Bottom Half 4대 메커니즘 비교
 | 메커니즘         | 실행 컨텍스트              | Sleep 가능 | 동적 생성          | 멀티코어 동시성                              | 주요 사용처                                   |
 | :--------------- | :------------------------- | :--------- | :----------------- | :------------------------------------------- | :-------------------------------------------- |
 | **Softirq**      | 소프트 인터럽트            | 불가       | 불가 (정적 컴파일) | 동일 핸들러가 여러 CPU에서 동시 실행 가능    | 네트워크 서브시스템, 고성능 블록 I/O          |
@@ -1147,64 +1507,30 @@ static irqreturn_t my_gpio_isr(int irq, void *dev_id)
 | **Workqueue**    | 커널 스레드 (`kworker`)    | **가능**   | 가능               | 여러 CPU에서 병렬 실행 가능                  | 일반 디바이스 드라이버 범용 Bottom Half       |
 | **Threaded IRQ** | 커널 스레드 (`irq/X-name`) | **가능**   | 가능               | 스레드 단위 스케줄링                         | 최신 리눅스 드라이버 인터럽트 처리 표준       |
 
----
-
-### Bottom Half 지연 처리 기법 4종 상세
-
-#### Workqueue (워크큐)
+#### 1. Workqueue (워크큐)
 프로세스 컨텍스트의 전용 커널 스레드(`kworker`)를 통해 작업을 비동기적으로 실행하는 지연 처리 메커니즘
+- `msleep()`, `mutex_lock()`, `kmalloc(GFP_KERNEL)`, `copy_to_user()`, `i2c_transfer()` 등 수면을 동반하는 모든 작업이 허용됨.
 
-- **허용되는 작업**:
-  | 작업 종류                 | API 예시                                     | 설명                                              |
-  | :------------------------ | :------------------------------------------- | :------------------------------------------------ |
-  | **Sleep / 지연**          | `msleep()`, `usleep_range()`, `ssleep()`     | 장시간 대기 및 수면 가능                          |
-  | **Mutex / Semaphore**     | `mutex_lock()`, `down()`                     | 블로킹 동기화 락 사용 가능                        |
-  | **메모리 동적 할당**      | `kmalloc(size, GFP_KERNEL)`                  | 페이지 교체 대기가 가능한 일반 커널 할당 가능     |
-  | **파일 / 버스 I/O**       | `vfs_read()`, `i2c_transfer()`, `spi_sync()` | I2C/SPI 등 동기식 버스 전송 및 파일 I/O 수행 가능 |
-  | **대기 큐 대기**          | `wait_event_interruptible()`                 | 조건 만족 시까지 프로세스 수면 가능               |
-  | **유저 공간 데이터 복사** | `copy_to_user()`, `copy_from_user()`         | Page Fault 수면이 수반되는 유저 버퍼 복사 가능    |
-
-- **Workqueue 구현 예시**:
 ```c
 #include <linux/workqueue.h>
 
 static struct workqueue_struct *my_wq;
 static struct work_struct my_work;
 
-// Bottom Half 핸들러 함수 (프로세스 컨텍스트 - Sleep 가능)
-static void my_work_handler(struct work_struct *work)
-{
-    /* 긴 작업, I2C/SPI 버스 통신, msleep() 등 수행 */
+static void my_work_handler(struct work_struct *work) {
     pr_info("Workqueue executed in process context: %s\n", current->comm);
 }
 
-static irqreturn_t my_isr(int irq, void *dev_id)
-{
-    // Top Half ISR에서 Workqueue로 지연 작업 큐잉
+static irqreturn_t my_isr(int irq, void *dev_id) {
     queue_work(my_wq, &my_work);
     return IRQ_HANDLED;
 }
-
-static int __init my_init(void)
-{
-    // 전용 워크큐 생성 및 작업 초기화
-    my_wq = create_singlethread_workqueue("my_custom_wq");
-    INIT_WORK(&my_work, my_work_handler);
-    return 0;
-}
-
-static void __exit my_exit(void)
-{
-    cancel_work_sync(&my_work); // 대기 중인 작업 취소 및 완료 대기
-    destroy_workqueue(my_wq);   // 워크큐 해제
-}
 ```
 
-#### Threaded IRQ (스레드화된 IRQ)
+#### 2. Threaded IRQ (스레드화된 IRQ)
 최신 리눅스 커널에서 I2C, SPI, 센서 디바이스 드라이버 인터럽트 처리에 가장 널리 권장되는 방식 (`<linux/interrupt.h>`)
+- Top Half에서는 빠른 검증 후 `IRQ_WAKE_THREAD`를 반환하고, 커널이 전용 스레드를 깨워 Sleep 가능한 버스 I/O를 수행.
 
-- **필요성**: I2C/SPI 기반 터치스크린이나 센서는 인터럽트가 발생했을 때 하드웨어 레지스터를 읽기 위해 I2C/SPI 버스 트랜잭션을 실행해야 합니다. 하지만 I2C/SPI 버스 컨트롤러 드라이버는 전송 완료 대기를 위해 내부적으로 Sleep(`wait_event` 등)을 사용하므로, 인터럽트 컨텍스트(Top Half)에서 직접 I2C/SPI 함수를 호출하면 커널 패닉이 발생합니다. Threaded IRQ를 사용하면 전용 커널 스레드에서 Sleep 가능한 I/O를 안전하게 수행할 수 있습니다
-- **Threaded IRQ 등록 API**:
 ```c
 int request_threaded_irq(unsigned int irq,
                          irq_handler_t handler,          // Primary Handler (Top Half: Fast ISR)
@@ -1213,45 +1539,12 @@ int request_threaded_irq(unsigned int irq,
                          const char *devname,
                          void *dev_id);
 ```
-- **동작 흐름 및 예시**:
-```c
-// 1. Primary Handler (Top Half - 인터럽트 컨텍스트, Sleep 불가)
-static irqreturn_t sensor_irq_top_half(int irq, void *dev_id)
-{
-    // 하드웨어 인터럽트 유효성 확인
-    // IRQ_WAKE_THREAD를 반환하면 커널이 bottom half 스레드를 스케줄링함
-    return IRQ_WAKE_THREAD;
-}
 
-// 2. Thread Function (Bottom Half - 커널 스레드 컨텍스트, Sleep 가능)
-static irqreturn_t sensor_irq_thread_fn(int irq, void *dev_id)
-{
-    struct sensor_dev *dev = (struct sensor_dev *)dev_id;
+#### 3. Softirq (소프트 인터럽트)
+- 정적으로 32개 등록되며 여러 CPU에서 동시 실행 가능. 네트워크 서브시스템, 타이머 등에 사용.
 
-    // I2C 버스를 통해 센서 데이터 읽기 (Sleep 가능)
-    i2c_smbus_read_i2c_block_data(dev->client, REG_DATA, 6, dev->buf);
-
-    dev->data_ready = 1;
-    wake_up_interruptible(&dev->wq);
-
-    return IRQ_HANDLED;
-}
-
-// 등록 (Top Half로 NULL 전달 시 기본 핸들러가 IRQ_WAKE_THREAD 자동 반환)
-ret = request_threaded_irq(irq, sensor_irq_top_half, sensor_irq_thread_fn,
-                           IRQF_TRIGGER_FALLING | IRQF_ONESHOT,
-                           "sensor_irq", dev);
-```
-
-#### Softirq (소프트 인터럽트)
-- 커널 소스 컴파일 시점에 정적으로 등록되는 초고속 지연 처리 메커니즘 (`open_softirq()`, 최대 32개로 제한)
-- 동일한 Softirq 핸들러가 **여러 CPU 코어에서 동시에 병렬 실행**될 수 있어 극도의 동기화 및 락(Lock) 관리가 필요합니다
-- 일반 디바이스 드라이버에서는 직접 등록할 수 없으며, 네트워크 서브시스템(`NET_TX_SOFTIRQ`, `NET_RX_SOFTIRQ`), 블록 계층, 타이머(`TIMER_SOFTIRQ`), RCU 등 커널 핵심 코어에서만 사용됩니다
-
-#### Tasklet (태스크릿)
-- Softirq(`TASKLET_SOFTIRQ`, `HI_SOFTIRQ`)를 기반으로 동적 생성이 가능하도록 구현된 가벼운 지연 처리 방식
-- 동일한 Tasklet 인스턴스는 다른 CPU에서 동시에 실행되지 않도록 커널이 직렬화(Serialization)를 보장합니다
-- **제약 및 현황**: 인터럽트 컨텍스트에서 실행되므로 여전히 Sleep이 불가능하며, 높은 우선순위로 인해 실시간성 저하를 유발할 수 있어 **현대 리눅스 커널(Linux 5.x/6.x 이후)에서는 공식적으로 사용을 지양(Deprecated)**하고 Workqueue 또는 Threaded IRQ로 대체하고 있습니다
+#### 4. Tasklet (태스크릿)
+- Softirq 기반으로 동작하며 단일 인스턴스가 직렬화되어 실행. 최신 커널에서는 Deprecated 추세.
 
 ---
 
@@ -1386,9 +1679,9 @@ MODULE_DESCRIPTION("GPIO Interrupt & Blocking I/O Character Device Driver");
 
 ---
 
-## 커널 동시성 & 동기화 제어 (Mutex & Concurrency)
+## 커널 동시성 & 동기화 제어 (Concurrency & Synchronization)
 
-### Race Condition
+### Race Condition 및 임계 영역 (Critical Section)
 1. 두 프로세스가 동시에 공유 자원 사용
 2. ISR과 일반 코드의 변수 공유
 3. **Read-Modify-Write 패턴**: 읽고 바꾸는 사이 다른 코드가 새로 읽고 바꾸고 써버리면 한쪽의 영향이 Lost update
@@ -1397,37 +1690,7 @@ MODULE_DESCRIPTION("GPIO Interrupt & Blocking I/O Character Device Driver");
 > 멀티 코어 환경에서는 동시성 문제를 다루기 위해 spinlock 같은 도구가 필요
 > 공유 자원은 항상 보호 (디버깅 작업 중 재현 불가지만 가능성이 반드시 존재)
 
-### 커널 뮤텍스 (Kernel Mutex)
-- **뮤텍스의 핵심**:
-  1. ownership (소유권)
-  2. not sleep (Lock 실패 시 수면 블록)
-  3. priority inheritance (우선순위 상속)
-- **사용 규칙**:
-  1. 프로세스 context에서만 사용 (Sleep으로 인한 블록)
-  2. Lock 한 주체, 소유자가 unlock
-  3. 재귀 lock 금지 (Deadlock 발생)
-  4. lock 상태에서 모듈 unload 금지
-  5. 중첩 lock 순서 일관성 유지 (FILO, LIFO)
-- **Mutex API**:
-  - `mutex_lock(struct mutex *)`
-  - `mutex_unlock(struct mutex *)`
-  - `mutex_lock_interruptible(struct mutex *)`
-  - `mutex_trylock(struct mutex *)`: Non-Blocking 구현, 이미 점유된 뮤텍스라면 기다리지 않고 0 반환
-
-### Spinlock
-Non-blocking, busy-wait을 하는 동기화 메커니즘
-CPU 자원을 낭비하지만 ISR, Tasklet, Softirq context의 유일한 공유 자원 보호 기능
-
-- `DEFINE_SPINLOCK(spinlock_t name);`
-- `spin_lock()`: ISR 내에서 사용
-- `spin_unlock()`: ISR 내에서 사용
-- `spin_lock_irqsave(&lock, flags)`: 자원을 공유하는 프로세스 컨텍스트에서 인터럽트를 비활성화하고 락 획득
-- `spin_unlock_irqrestore(&lock, flags)`: 이전 인터럽트 상태를 복원하고 락 해제
-
-**사용 규칙**:
-- Critical Section 최소화
-- Sleep 가능 함수 호출 절대 금지
-- `copy_*_user()` 사용 금지 (Page fault 유발)
+---
 
 ### 원자적 연산 (`atomic_t`)
 원자적 연산은 중요하지만 간단한 변수 하나에 mutex, spinlock은 낭비가 심합니다 $\rightarrow$ 원자적 `atomic_t` 타입의 변수와 전용 API 함수를 사용합니다
@@ -1446,20 +1709,59 @@ CPU 자원을 낭비하지만 ISR, Tasklet, Softirq context의 유일한 공유 
 
 ---
 
+### Spinlock vs Kernel Mutex (상호 배제)
+
+#### 커널 뮤텍스 (Kernel Mutex)
+- **뮤텍스의 핵심**:
+  1. ownership (소유권)
+  2. not busy-wait (Lock 실패 시 수면 블록 및 스케줄링 양보)
+  3. priority inheritance (우선순위 상속)
+- **사용 규칙**:
+  1. 프로세스 context에서만 사용 (Sleep으로 인한 블록)
+  2. Lock 한 주체, 소유자가 unlock
+  3. 재귀 lock 금지 (Deadlock 발생)
+  4. lock 상태에서 모듈 unload 금지
+  5. 중첩 lock 순서 일관성 유지 (FILO, LIFO)
+- **Mutex API**:
+  - `mutex_lock(struct mutex *)`
+  - `mutex_unlock(struct mutex *)`
+  - `mutex_lock_interruptible(struct mutex *)`
+  - `mutex_trylock(struct mutex *)`: Non-Blocking 구현, 이미 점유된 뮤텍스라면 기다리지 않고 0 반환
+
+#### Spinlock
+Non-blocking, busy-wait을 하는 동기화 메커니즘
+CPU 자원을 낭비하지만 ISR, Tasklet, Softirq context의 유일한 공유 자원 보호 기능
+
+- `DEFINE_SPINLOCK(spinlock_t name);`
+- `spin_lock()`: ISR 내에서 사용
+- `spin_unlock()`: ISR 내에서 사용
+- `spin_lock_irqsave(&lock, flags)`: 자원을 공유하는 프로세스 컨텍스트에서 인터럽트를 비활성화하고 락 획득
+- `spin_unlock_irqrestore(&lock, flags)`: 이전 인터럽트 상태를 복원하고 락 해제
+
+**사용 규칙**:
+- Critical Section 최소화
+- Sleep 가능 함수 호출 절대 금지
+- `copy_*_user()` 사용 금지 (Page fault 유발)
+
+---
+
+### Completion (경쟁 상태 완화를 위한 동기화)
+한 스레드가 다른 스레드나 인터럽트의 특정 작업 완료 신호를 대기할 때 사용하는 가벼운 동기화 메커니즘 (`<linux/completion.h>`)
+- `init_completion(&comp)`
+- `wait_for_completion(&comp)`: 작업 완료 시까지 Sleep 대기
+- `complete(&comp)`: 대기 중인 스레드 하나를 깨움
+- `complete_all(&comp)`: 대기 중인 모든 스레드를 깨움
+
+---
+
 ### 커널 스레드 (kernel thread, kthread)
 커널 공간(Kernel Space)에서 백그라운드 작업을 독립적으로 수행하기 위해 커널에 의해 생성되고 관리되는 스레드.
 
-#### 커널 스레드의 특징 및 개념
+#### 커널 스레드의 특징 및 핵심 API
 - **주소 공간 (Address Space)**: 유저 공간 가상 메모리가 없음 (`current->mm == NULL`). 커널 영역 메모리만 참조하며 이전 프로세스의 `active_mm`을 차용.
 - **프로세스 컨텍스트 (Process Context)**: 인터럽트 컨텍스트(ISR)와 달리 프로세스 컨텍스트에서 실행되므로, `msleep()`, `schedule()`, 뮤텍스 락 대기 등 **블로킹(Sleep/Wait)이 가능**.
 - **부모 프로세스**: 시스템 부팅 시 커널의 2번 프로세스인 `kthreadd`가 모든 커널 스레드의 부모(PPID=2)가 됨 (`ps -ef` 실행 시 대괄호 `[...]`로 표시).
-- **주요 활용 사례**:
-  - 주기적인 하드웨어 상태 폴링 또는 헬스체크
-  - 대용량 데이터 버퍼 플러시 및 비동기 후처리
-  - 멀티채널 고속 DMA 수신 대기 및 패킷 처리
-  - 실시간 제어 루프 (Real-Time Control Loop)
 
-#### 핵심 API 및 생명주기 (`<linux/kthread.h>`)
 | API                                      | 설명                                                                                            |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------- |
 | `kthread_create(fn, data, namefmt, ...)` | 스레드를 생성하고 `TASK_UNINTERRUPTIBLE` 상태로 대기 (실행하려면 `wake_up_process()` 호출 필요) |
@@ -1468,7 +1770,6 @@ CPU 자원을 낭비하지만 ISR, Tasklet, Softirq context의 유일한 공유 
 | `kthread_stop(task)`                     | 스레드에 중지 신호를 보내고, 스레드 함수가 완전히 반환(`return`)될 때까지 블로킹 대기           |
 | `kthread_bind(task, cpu)`                | 특정 CPU 코어에 스레드를 고정 (Affinity 설정, 실행 전 호출 권장)                                |
 
-**기본적인 kthread 제어 패턴 (단일 스레드 예시)**:
 ```c
 #include <linux/kthread.h>
 #include <linux/delay.h>
@@ -1478,35 +1779,22 @@ static struct task_struct *my_thread = NULL;
 static int thread_fn(void *data)
 {
     pr_info("kthread: started\n");
-
-    // kthread_stop()이 호출될 때까지 루프 반복
     while (!kthread_should_stop()) {
-        // 백그라운드 작업 수행
         pr_info("kthread: working...\n");
-
-        // 대기 (인터럽트 가능한 수면)
         msleep_interruptible(1000);
     }
-
     pr_info("kthread: exiting\n");
     return 0;
 }
 
-static int __init my_module_init(void)
-{
-    // 스레드 생성 및 즉시 실행
+static int __init my_module_init(void) {
     my_thread = kthread_run(thread_fn, NULL, "my_kthread_%d", 0);
-    if (IS_ERR(my_thread)) {
-        pr_err("Failed to create kthread\n");
-        return PTR_ERR(my_thread);
-    }
+    if (IS_ERR(my_thread)) return PTR_ERR(my_thread);
     return 0;
 }
 
-static void __exit my_module_exit(void)
-{
+static void __exit my_module_exit(void) {
     if (my_thread) {
-        // 스레드 종료 요청 및 완료 대기
         kthread_stop(my_thread);
         my_thread = NULL;
     }
@@ -1517,59 +1805,24 @@ static void __exit my_module_exit(void)
 > **kthread_stop() 사용 시 주의사항**
 > - 스레드가 스스로 `do_exit()` 등으로 자율 종료된 후 `kthread_stop()`을 호출하면 이미 해제된 `task_struct`를 참조하여 커널 패닉(Kernel Crash / Oops)이 발생합니다.
 > - 따라서 스레드 함수는 자율 종료보다는 `while (!kthread_should_stop())` 루프를 유지하고 모듈 언로드 등에서 `kthread_stop()`에 의해 제어되도록 설계해야 합니다.
-> - 스레드가 `wait_event()` 등으로 대기 중인 경우, `kthread_stop()`이 내부적으로 깨우긴 하지만 대기 조건에 `kthread_should_stop()`을 함께 포함해야 데드락 없이 즉각 빠져나옵니다.
 
-#### kthread Priority Set (우선순위 및 스케줄링 설정)
-커널 스레드는 기본적으로 일반 CFS 스케줄러(`SCHED_NORMAL`)의 우선순위를 갖지만, 실시간 응답성이 필요한 경우 RT 정책(`SCHED_FIFO`, `SCHED_RR`)이나 Nice 값을 조정할 수 있습니다.
-
+#### kthread Priority Set (Nice값, RT 우선순위 설정)
 ##### 1) Nice 값 설정 (CFS / `SCHED_NORMAL`)
-일반 스레드의 우선순위를 상대적으로 조정합니다 (-20: 최고 우선순위, 19: 최저 우선순위).
 ```c
 #include <linux/sched.h>
-
-// 스레드 함수 내부에서 자신의 nice 설정
-set_user_nice(current, -10);
-
-// 또는 스레드 핸들(task_struct)로 외부에서 설정
-set_user_nice(my_thread, -10);
+set_user_nice(current, -10); // -20(최고) ~ 19(최저)
 ```
 
 ##### 2) Real-Time (RT) 우선순위 설정 (`SCHED_FIFO` / `SCHED_RR`)
-하드웨어 제어나 저지연 고속 패킷 처리를 위해 RT 스케줄링을 적용합니다. RT 우선순위 범위는 `1` (최저) ~ `99` (최고).
-- **최신 커널 헬퍼 함수 활용 (권장)**:
-  ```c
-  #include <linux/sched.h>
+```c
+#include <linux/sched.h>
+sched_set_fifo(my_thread); // 기본 RT 우선순위 50 설정
+sched_set_normal(my_thread, 0); // 일반 CFS 복원
+```
 
-  // SCHED_FIFO 적용 (기본 RT 우선순위: 50)
-  sched_set_fifo(my_thread);
-
-  // 최저 RT 우선순위(1)로 설정
-  sched_set_fifo_low(my_thread);
-
-  // 다시 일반 CFS(nice 0)로 복원
-  sched_set_normal(my_thread, 0);
-  ```
-- **상세 파라미터 직접 지정 (`sched_setscheduler`)**:
-  ```c
-  #include <uapi/linux/sched/types.h>
-
-  struct sched_param param = { .sched_priority = 80 }; // 1~99
-  sched_setscheduler(my_thread, SCHED_FIFO, &param);
-  ```
-
-> [!CAUTION]
-> **RT 커널 스레드 주의사항**
-> `SCHED_FIFO` 스레드가 CPU를 양보하지 않고 무한 연산 루프를 돌면 해당 코어의 모든 일반 프로세스와 다른 스레드가 멈추는 CPU Starvation 현상이 발생합니다. 반드시 루프 내에 `msleep()`, `usleep_range()`, `schedule()`, 또는 `wait_event()`를 두어 CPU를 양보해야 합니다.
-
-#### Multiple kthread (다중 커널 스레드 구성 및 관리)
-멀티코어 분산 처리, 멀티 채널 DMA, Producer-Consumer 파이프라인 처리 시 여러 개의 kthread를 생성하고 동기화하여 운영합니다.
-
-##### 1) 다중 스레드 배열 관리 및 CPU Affinity 바인딩
-특정 CPU 코어에 스레드를 1:1로 고정(`kthread_bind`)하면 캐시 미스를 최소화하고 코어 간 간섭을 줄일 수 있습니다.
-
+#### Multiple kthread 구성 및 관리 (Affinity, 동기화, Workqueue 비교)
 ```c
 #define NUM_THREADS 4
-
 static struct task_struct *workers[NUM_THREADS];
 
 struct worker_data {
@@ -1579,86 +1832,25 @@ struct worker_data {
 };
 static struct worker_data g_data[NUM_THREADS];
 
-static int multi_worker_fn(void *arg)
-{
+static int multi_worker_fn(void *arg) {
     struct worker_data *data = (struct worker_data *)arg;
     int id = data->id;
 
-    pr_info("Worker[%d] started on CPU %d\n", id, smp_processor_id());
-
     while (!kthread_should_stop()) {
-        // 작업 이벤트 발생 또는 stop 요청 시까지 sleep (CPU 점유 0%)
         wait_event_interruptible(data->wq,
             atomic_read(&data->has_work) || kthread_should_stop());
 
-        if (kthread_should_stop())
-            break;
+        if (kthread_should_stop()) break;
 
         if (atomic_read(&data->has_work)) {
-            // 실제 작업 처리 수행
             pr_info("Worker[%d] processing on CPU %d\n", id, smp_processor_id());
             atomic_set(&data->has_work, 0);
         }
     }
-
-    pr_info("Worker[%d] terminating\n", id);
     return 0;
-}
-
-// 초기화: 스레드 생성, CPU 바인딩 및 기상
-int init_multi_threads(void)
-{
-    int i;
-    for (i = 0; i < NUM_THREADS; i++) {
-        g_data[i].id = i;
-        init_waitqueue_head(&g_data[i].wq);
-        atomic_set(&g_data[i].has_work, 0);
-
-        // 1. 스레드 생성 (대기 상태)
-        workers[i] = kthread_create(multi_worker_fn, &g_data[i], "my_worker/%d", i);
-        if (IS_ERR(workers[i])) {
-            pr_err("Failed to create worker %d\n", i);
-            goto cleanup;
-        }
-
-        // 2. CPU 바인딩 (i번째 코어에 할당)
-        kthread_bind(workers[i], i % num_online_cpus());
-
-        // 3. 스레드 실행 시작
-        wake_up_process(workers[i]);
-    }
-    return 0;
-
-cleanup:
-    while (--i >= 0) {
-        if (workers[i])
-            kthread_stop(workers[i]);
-    }
-    return -ENOMEM;
-}
-
-// 정리: 모든 스레드 안전 종료
-void exit_multi_threads(void)
-{
-    int i;
-    for (i = 0; i < NUM_THREADS; i++) {
-        if (workers[i]) {
-            // wait_event에서 빠져나올 수 있도록 kthread_stop 호출 (내부적으로 wake_up_process 수행)
-            kthread_stop(workers[i]);
-            workers[i] = NULL;
-        }
-    }
 }
 ```
 
-##### 2) 다중 스레드 동기화 기법
-- **Waitqueue (`wait_event_interruptible` / `wake_up`)**: 작업이 없을 때 스레드를 슬립 상태로 유지하여 불필요한 CPU 점유 방지.
-- **Completion (`wait_for_completion` / `complete`)**: 특정 작업(예: 스레드 초기화 완료, 특정 스테이지 완료)을 1회성으로 동기화할 때 유용.
-- **Spinlock vs Mutex**:
-  - `mutex`: 커널 스레드는 프로세스 컨텍스트이므로 뮤텍스를 통한 블로킹 락 사용 가능.
-  - `spinlock`: 인터럽트 핸들러(Top-half)와 커널 스레드 간 데이터 공유 시 `spin_lock_irqsave` 필수.
-
-##### 3) kthread vs Workqueue 비교 선택 가이드
 | 구분              | Kernel Thread (kthread)                                     | Workqueue (`alloc_workqueue`)                                 |
 | ----------------- | ----------------------------------------------------------- | ------------------------------------------------------------- |
 | **실행 주체**     | 드라이버가 직접 생성/제어하는 전용 태스크                   | 커널 공용 워커 풀 (`kworker/*`) 공유                          |
@@ -1669,85 +1861,40 @@ void exit_multi_threads(void)
 
 ---
 
-### File Permission
-디바이스 드라이버 파일에도 적용되는 파일 권한의 값
-기본적인 
+## 커널 메모리 관리 & 고급 I/O 기법 (Kernel Memory & High-Performance I/O)
 
-- `0brwxrwxrwx` or `0[root][group][other]`
+### 커널 동적 메모리 할당 (`kmalloc`, `vmalloc`, `kmem_cache`)
+커널 내부에서 메모리를 동적으로 할당할 때 목적에 맞춰 아래의 할당자를 선택합니다
 
-#### Linux Capability system 
-Linux Capability system는 root 권한을 세분화된 단위로 분리한다
-드라이버 작성자에 의해 특정 권한 레벨에 대한 특정 파일 입출력을 추가적으로 제한 또는 구현 할 수 있다
-
-*driver level Permission check*
-- `capable(CAP_SYS_ADMIN)`
-
-**에러 코드의 차이**
-- `-EPREM`  : 프로세스의 Capability/권한이 부족할 때
-- `-EACCESS`: 파일 접근 모드가 맞지 않을 때
-
-
-### DMA engine, asyncronous memory transfer
-메모리 이동을 CPU가 처리하지 않고, 대신 DMA 하드웨어를 이용하여 CPU 비동기적, 비점유 방식으로 데이터를 전송하는 것
-
-- `Burst Transfer`: 연속된 주소에 있는 데이터를 연속으로 전송, 일반적으로 약 4배 빠름
-
-**필요한 사례 예시**
-- 고속 데이터 스트리밍
-- 네트워크 패킷 처리
-- PS (Processing System) - PL (Programmable Logic) 간 데이터 교환
-
-#### DMA 전송 유형
-- DMA_MEMCPY     : mem to mem copy
-- DMA_MEMSET     : 메모리 채우기
-- DMA_SG         : Scatter-Gather, 비연속 메모리 블록 전송 = 흩어져 있는 메모리 블록들을 한곳에 보냄
-- DMA_CYCLIC     : 순환 버퍼
-- DMA_SLAVE      : peripheral to mem copy
-- DMA_INTERLEAVE : interleave 패턴 전송
-
-#### DMA 메모리 할당
-DMA는 physical address로 메모리에 접근.
-
-**kmalloc()을 쓰면 안되는 이유**
-- kmalloc 반환 주소값은 Virtual Address, DMA에 호환 안됨.
-- 캐시 일관성 문제: 캐시에 있는 데이터가 메모리에 반영되지 않아 오래된 값 전송, DMA가 DDR에 옮겼지만 해당 주소 내용이 캐시에 남아있다면 오래된 값 사용.
-
-**캐시 일관성 문제 해결법**
-- CPU 쓰기, DMA 읽기 시 문제: CPU 캐시 flush 후 DMA가 읽기
-- DMA 쓰기, CPU 읽기 시 문제: CPU 캐시 invalidate 후 DDR에서 다시 읽기
-
-`dma_alloc_coherent(struct device *, size_t, dma_addr_t*, gfp_t)`: 캐시 우회 및 직접 쓰기, 읽기 적용한 DMA API. 
-
-gfp_t
-- GFP_KERNEL: 프로세스 컨텍스트에서 사용
-- GFP_ATOMIC: 인터럽트 컨텍스트에서 사용
+| 구분                | `kmalloc()`                             | `vmalloc()`                                     | SLAB / SLUB Allocator (`kmem_cache`)                    |
+| :------------------ | :-------------------------------------- | :---------------------------------------------- | :------------------------------------------------------ |
+| **메모리 연속성**   | **물리적 & 가상으로 모두 연속**         | **가상 메모리만 연속** (물리적으로 불연속 가능) | 객체 단위 연속 할당                                     |
+| **할당 크기**       | 작은 크기 (보통 4KB ~ 128KB 이하)       | 대용량 메모리 할당에 적합                       | 자주 사용되는 특정 구조체 크기                          |
+| **속도 / 오버헤드** | 매우 빠름 (DMA 접근 가능)               | 상대적으로 느림 (페이지 테이블 재구성 오버헤드) | 매우 빠름 (객체 재사용 캐싱)                            |
+| **주요 용도**       | 하드웨어 I/O 버퍼, 드라이버 소형 구조체 | 대형 소프트웨어 버퍼, 커널 모듈 코드 로딩       | `struct task_struct`, `struct file` 등 커널 구조체 캐시 |
 
 ---
 
-### mmap
+### Memory Mapping (`mmap`)
 드라이버 단의 mmap 구현
 
 **mmap의 필요 배경**
-read() write()를 통해 디바이스와 접근하면 두번의 복사 발생
+`read()` / `write()`를 통해 디바이스에 접근하면 2번의 데이터 복사가 발생합니다:
 1. 유저 프로세스에서 커널 영역으로 전달
-2. 커널 영역에서 하드웨어 전달
-이 경우 아래 데이터들을 다루면 큰 자원 낭비
-- 비디오 프레임버퍼
-- 대용량 센서 데이터
-- DMA 전송 버퍼
-- 하드웨어 레지스터
+2. 커널 영역에서 하드웨어로 전달
+이 경우 아래 대용량 데이터들을 다루면 큰 성능 저하가 발생하므로 `mmap()`을 사용합니다:
+- 비디오 프레임버퍼 (`fbdev`, `DRM/KMS`)
+- V4L2 카메라 버퍼 (`videobuf2`)
+- DMA 전송 결과 버퍼 (`ALSA`)
+- 하드웨어 레지스터 접근 (`UIO` / FPGA PL)
+- IPC 공유 메모리 (`shm_open`)
 
-
-#### mmap의 동작 원리
-`mmap()`의 핵심은 Page Table 조작.
-
-1. 유저 ps mmap() 호출
-2. 커널이 VMA 생성: 프로세스 가상 주소 공간의 빈 영역에 vm_area_struct 구조체 생성
-3. 드라이버 .mmap 핸들러 호출: struct file_operations.mmap
-4. remap_pfn_range() 실행: 드라이버가 Physical Frame Number를 유저 가상 주소에 매핑하도록 PTE에 설정.
-
-**`vm_area_struct` 구조체**
-.mmap 핸들러 호출 시 커널은 `vm_area_struct`의 포인터 전달.
+#### `mmap`의 동작 원리 및 주소 공간 매핑
+`mmap()`의 핵심은 **Page Table 조작**입니다.
+1. 유저 프로세스가 `mmap()` 호출
+2. 커널이 VMA 생성: 프로세스 가상 주소 공간의 빈 영역에 `vm_area_struct` 구조체 생성
+3. 드라이버 `.mmap` 핸들러 호출: `struct file_operations.mmap`
+4. `remap_pfn_range()` 실행: 드라이버가 Physical Frame Number를 유저 가상 주소에 매핑하도록 PTE에 설정
 
 ```c
 struct vm_area_struct {
@@ -1757,7 +1904,7 @@ struct vm_area_struct {
   pgprot_t vm_page_prot;        // R/W/X 권한
   unsigned long vm_flags;       // flag  
   struct file *vm_file;         // 파일 포인터
-}
+};
 ```
 
 | pgprot_t   | 의미      |
@@ -1777,715 +1924,45 @@ struct vm_area_struct {
 | `VM_DONTEXPAND` | `mremap()` 등을 통한 VMA 확장 방지             |
 | `VM_DONTDUMP`   | Core dump 시 해당 영역 제외                    |
 
-| 필드 / 오프셋 | 의미                                                                                    |
-| ------------- | --------------------------------------------------------------------------------------- |
-| `vm_pgoff`    | 파일 또는 디바이스 메모리 내 시작 오프셋 (단위: Page, 4KB 기준 `address >> PAGE_SHIFT`) |
+**`msync()`**: `MAP_SHARED`로 매핑한 경우 캐시와 메모리 사이의 동기화 보장
 
-**msync()**: 쓰기 동기화
-MAP_SHARED로 매핑한 경우, 캐시와 메모리 사이의 동기화 보장
-
-
-#### mmap의 활용 사례
-| 분야                   | 설명                                   | 커널 드라이버 예시 |
-| ---------------------- | -------------------------------------- | ------------------ |
-| 비디오 프레임버퍼      | 화면 출력 버퍼를 직접 사용             | fbdev,DRM/KMS      |
-| V4L2카메라 버퍼        | 카메라 프레임을 복사 없이 사용         | videobuf2          |
-| DMA 결과 버퍼          | 전송 완료 데이터를 직접 읽기           | ALSA               |
-| 하드웨어 레지스터 접근 | 성능 카운터, 디버깅용 레지스터 polling | UIO                |
-| IPC 공유 메모리        | 대용량 데이터 공유                     | shm_open + mmap    |
-| 파일 I/O 최적화        | 대용량 파일 read/write                 | -                  |
-
-*FPGA와 UIO 패턴*
-PL 영역에서 구현한 커스텀 IP의 레지스터를 PS의 유저 공간에서 직접 제어하면 효율적.
+#### 드라이버에서의 `nopage`/`fault` 핸들러 구현
+- `remap_pfn_range()`는 mmap 호출 시점에 한 번에 모든 페이지를 매핑하는 방식입니다.
+- 반면 대용량 버퍼나 온디맨드 메모리 할당의 경우 `struct vm_operations_struct`의 `.fault` 핸들러를 등록하여, 유저 공간이 실제 메모리에 접근하는 시점에 발생하는 Page Fault를 가로채 동적으로 페이지를 할당 및 매핑할 수 있습니다.
 
 ---
 
-## Linux Device Tree 및 커널 드라이버 연동
-
-### 1. Device Tree 기본 개념 및 도입 배경
-
-#### 1.1 도입 배경 (Board File 방식의 한계와 패러다임 전환)
-- **레거시 Board File 방식 (`arch/arm/mach-*`)의 문제점**:
-  - 임베디드 리눅스 초기에는 각 보드의 하드웨어 정보(UART 베이스 주소, IRQ 번호, GPIO 핀 매핑, I2C/SPI 슬레이브 주소 등)가 C 소스 파일(`board-*.c`) 형태로 커널 소스 트리에 직접 하드코딩되었습니다.
-  - **커널 소스 오염 (Kernel Bloat)**: 새로운 보드와 SoC가 출시될 때마다 수천 줄의 중복된 보드 파일이 커널 소스에 추가되어 유지보수가 불가능할 정도로 비대해짐 (2011년 Linus Torvalds의 *"ARM 커널 소스는 쓰레기장 같다"*는 유명한 비판 계기).
-  - **단일 커널 이미지(Single Kernel Image) 불가**: 동일한 SoC라도 메모리 맵이나 주변장치 구성이 조금만 다르면 커널 바이너리 자체를 따로 빌드해야 함.
-  - **유지보수 비용 폭증**: 사소한 하드웨어 변경(핀 번호, IRQ 등)에도 전체 커널을 재컴파일하고 재배포해야 하는 문제.
-
-- **Device Tree의 해결책과 의의**:
-  - **하드웨어 명세와 커널 코드의 완전한 분리**: 하드웨어 명세는 독립적인 텍스트 파일(DTS)로 분리하고, 커널 바이너리(`zImage`/`Image`)는 순수한 실행 로직만 담당.
-  - **단일 바이너리 재사용 (Single Kernel Image)**: 동일한 커널 바이너리로 부팅하되, 부트로더가 타깃 보드에 맞는 컴파일된 디바이스 트리(`*.dtb`)를 메모리에 로드하여 커널에 전달하면 커널이 런타임에 동적으로 하드웨어 구조를 파싱.
-  - **신속한 보드 포팅 및 유지보수**: 하드웨어 변경 시 커널을 재빌드하지 않고 DTS 파일 수정 및 DTB 컴파일만으로 즉시 적용 가능.
-
-```mermaid
-flowchart TD
-    subgraph Legacy ["과거 Board File 방식"]
-        BF["하드웨어 하드코딩<br>(board-omap.c, board-smdk.c)"] -->|"함께 컴파일"| KB["보드별 전용 커널 바이너리<br>(vmlinuz_boardA, vmlinuz_boardB)"]
-    end
-
-    subgraph Modern ["현대 Device Tree 방식"]
-        DTS1["DTS / DTSI<br>(보드 A 명세)"] -->|DTC 컴파일| DTB1["DTB 바이너리 (보드 A)"]
-        DTS2["DTS / DTSI<br>(보드 B 명세)"] -->|DTC 컴파일| DTB2["DTB 바이너리 (보드 B)"]
-        GenericKernel["단일 범용 커널 바이너리<br>(zImage / Image)"]
-        
-        DTB1 --> Bootloader1["부트로더 (U-Boot)"]
-        GenericKernel --> Bootloader1
-        Bootloader1 -->|"런타임 파싱 (동적 구성)"| RunningKernel1["실행 중인 리눅스 커널"]
-    end
-```
-
----
-
-#### 1.2 핵심 용어 및 컴파일 체계
-| 용어       | 풀네임 (Full Name)                                | 설명 및 역할                                                                                                                                  |
-| :--------- | :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------- |
-| **DTS**    | **Device Tree Source**                            | 사람이 읽고 편집할 수 있는 텍스트 형태의 하드웨어 기술 소스 파일 (`.dts`). 최상위 보드 파일.                                                  |
-| **DTSI**   | **Device Tree Source Include**                    | 여러 보드나 동일 SoC 계열에서 공통으로 재사용되는 노드 정의를 모아둔 인클루드/헤더 파일 (`.dtsi`). `#include` 또는 `/include/` 구문으로 포함. |
-| **DTB**    | **Device Tree Blob (Flattened Device Tree, FDT)** | DTC 컴파일러를 통해 컴파일된 바이너리 형태의 디바이스 트리 파일 (`.dtb`). 부트로더가 DRAM에 적재 후 커널에 메모리 주소를 전달.                |
-| **DTC**    | **Device Tree Compiler**                          | 텍스트 파일인 DTS를 바이너리 DTB로 변환(또는 역변환 디컴파일 `dtb -> dts`)하는 전용 컴파일러 도구.                                            |
-| **OF API** | **Open Firmware API**                             | PowerPC Open Firmware 규격에서 유래한 리눅스 커널 내부의 디바이스 트리 파싱 및 노드 탐색 함수군 (`of_property_read_*`, `of_find_node_*` 등).  |
-
----
-
-#### 1.3 기본 DTS 문법 및 노드 구조
-디바이스 트리는 루트 노드(`/`)를 시작점으로 하는 계층적 트리 구조(Tree Structure)를 가집니다.
-
-```dts
-/dts-v1/; // DTS 버전 선언 (필수)
-
-// 1. 공통 헤더/SoC 정의 인클루드
-#include "zynq-7000.dtsi"
-
-// 2. 루트 노드 (Root Node)
-/ {
-    model = "Xilinx Zynq ZED Board"; // 보드 식별 명칭
-    compatible = "xlnx,zynq-zed", "xlnx,zynq-7000"; // 최상위 호환성 문자열
-
-    #address-cells = <1>;
-    #size-cells = <1>;
-
-    // 3. 자식 노드 정의: [label:] node-name[@unit-address]
-    aliases {
-        serial0 = &uart1;
-    };
-
-    memory@0 {
-        device_type = "memory";
-        reg = <0x00000000 0x20000000>; // 512MB RAM
-    };
-
-    chosen {
-        bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw earlyprintk";
-        stdout-path = "serial0:115200n8";
-    };
-
-    soc {
-        #address-cells = <1>;
-        #size-cells = <1>;
-        compatible = "simple-bus";
-        ranges;
-
-        my_led: gpio-leds@41200000 {
-            compatible = "vendor,custom-led-1.0";
-            reg = <0x41200000 0x1000>;
-            status = "okay";
-        };
-    };
-};
-```
-
-##### 1 노드 및 속성 명명 규칙
-- **노드 명명 형식**: `[레이블:] 노드이름[@단위주소]`
-  - `label:`: 타 노드에서 이 노드를 직접 참조(phandle)하기 위한 식별자 (예: `&my_led`).
-  - `node-name`: 소문자 알파벳으로 시작하는 장치 유형 (예: `serial`, `ethernet`, `timer`).
-  - `@unit-address`: 장치의 기본 물리 시작 주소 또는 채널 번호 (해당 노드의 `reg` 첫 번째 값과 일치해야 함).
-  - *형제 노드(Sibling Nodes) 간에는 이름이 유일해야 하지만, 단위 주소가 다르면 동일 노드 이름 사용 가능.*
-
-##### 2 프로퍼티(Property) 데이터 타입
-디바이스 트리의 속성값은 바이트, 정수, 문자열, 빈 속성 등으로 표현됩니다.
-| 데이터 타입                   | 문법 표현               | 설명 및 예시                                                                       |
-| :---------------------------- | :---------------------- | :--------------------------------------------------------------------------------- |
-| **32-bit Cell (정수)**        | `<0x1000 42>`           | 꺾쇠괄호 `< >` 안에 32비트 부호 없는 정수(빅엔디안)를 공백으로 나열.               |
-| **String (문자열)**           | `"okay"`                | 큰따옴표 `" "`로 묶은 NULL 종료 ASCII 문자열.                                      |
-| **String List (문자열 목록)** | `"ns16550a", "ns16550"` | 쉼표로 구분된 문자열 배열 (우선순위 순 드라이버 매칭).                             |
-| **Byte String (바이트 배열)** | `[00 11 22 33 AA BB]`   | 대괄호 `[ ]` 안에 16진수 바이트를 2자리씩 공백으로 나열 (주로 MAC 주소 등에 사용). |
-| **Empty / Boolean (플래그)**  | `empty-property;`       | 값이 없는 속성. 속성의 존재 여부 자체가 `true` / `false`를 의미.                   |
-| **phandle (노드 참조)**       | `<&uart0>`              | 꺾쇠 안에 `&레이블` 형태로 타 노드를 가리킴. DTC 컴파일 시 고유 정수 ID로 치환.    |
-
-##### 3 핵심 공통 표준 속성
-- **`compatible`**: 디바이스 노드와 리눅스 커널 드라이버를 연결하는 **가장 핵심적인 키(Key)**. `"제조사,모델명"` 형식.
-- **`status`**: 하드웨어 활성화 상태 (`"okay"`: 정상 활성화, `"disabled"`: 사용 안 함 / 드라이버 probe 방지).
-- **`phandle`**: 노드 간 상호 연결(인터럽트 컨트롤러 참조, 클럭/GPIO 참조 등)을 위한 내부 32비트 포인터 ID.
-
----
-
-### 2. Device Tree 세부 문법 (DTS Syntax Details)
-
-#### 2.1 `reg` 속성과 주소 지정 모델 (`#address-cells`, `#size-cells`)
-
-디바이스 노드의 주소와 메모리 매핑 크기는 해당 노드의 부모 버스 노드에 선언된 `#address-cells`와 `#size-cells`에 의해 결정됩니다.
-
-##### 주소 셀 상속 규칙
-- 자식 노드의 `reg`에 적히는 정수(u32) 셀의 개수는 **부모 노드**의 설정을 따릅니다.
-- `#address-cells`: 디바이스의 시작 주소를 표현하는 32비트 정수(Cell)의 개수
-- `#size-cells`: 디바이스가 점유하는 메모리 크기(Range)를 표현하는 32비트 정수(Cell)의 개수
-
-```dts
-/ {
-    #address-cells = <1>;
-    #size-cells = <1>;
-
-    soc {
-        #address-cells = <1>;
-        #size-cells = <1>;
-        compatible = "simple-bus";
-        ranges;
-
-        // 부모(soc)의 #address-cells = 1, #size-cells = 1 적용
-        // 물리 주소 0x40000000, 크기 0x1000 (4KB)
-        serial@40000000 {
-            compatible = "ns16550a";
-            reg = <0x40000000 0x1000>;
-        };
-
-        // 64비트 시스템의 경우: #address-cells = <2>, #size-cells = <2>
-        // reg = <0x0 0x80000000 0x0 0x40000000>; // 2GB 메모리 영역
-    };
-};
-```
-
-##### 버스 유형별 `reg` 속성의 의미
-버스 유형에 따라 `reg`는 물리 메모리 주소뿐만 아니라 채널 번호나 슬레이브 주소를 나타냅니다.
-
-| 버스 유형                  | `#address-cells` | `#size-cells` | `reg`의 의미                   | 예시                          |
-| :------------------------- | :--------------: | :-----------: | :----------------------------- | :---------------------------- |
-| **Memory-mapped (MMIO)**   |     1 또는 2     |   1 또는 2    | 시작 물리 메모리 주소 및 크기  | `reg = <0x43C00000 0x10000>;` |
-| **I2C 버스**               |        1         |       0       | I2C 슬레이브 7비트 주소        | `reg = <0x50>;` (EEPROM 주소) |
-| **SPI 버스**               |        1         |       0       | SPI Chip Select (CS) 라인 번호 | `reg = <0>;` (CS 0번 채널)    |
-| **MDIO 버스 (이더넷 PHY)** |        1         |       0       | PHY 주소 (0 ~ 31)              | `reg = <1>;` (PHY ID 1)       |
-
-##### 다중 레지스터 뱅크
-하나의 디바이스가 여러 개의 독립된 메모리 영역(예: 제어 레지스터와 데이터 FIFO 버퍼)을 가질 경우 튜플 형태로 나열하며, 드라이버 편의를 위해 `reg-names` 속성을 함께 명시합니다.
-
-```dts
-my_device@40000000 {
-    compatible = "vendor,my-device";
-    reg = <0x40000000 0x1000>,
-          <0x40001000 0x2000>;
-    reg-names = "control", "fifo";
-};
-```
-
----
-
-#### 2.2 `interrupts` 속성과 인터럽트 컨트롤러 (Interrupt Architecture)
-
-디바이스 트리는 계층적 인터럽트 제어 구조(Tree topology)를 명확하게 표현합니다.
-
-##### 핵심 속성 정의
-- `interrupt-controller`: 해당 노드가 인터럽트 신호를 수신하고 중재하는 컨트롤러(IC)임을 선언하는 빈 속성 (Boolean).
-- `#interrupt-cells`: 이 컨트롤러에 연결되는 디바이스 노드가 인터럽트 번호 및 속성을 정의할 때 사용해야 하는 32비트 셀 개수.
-- `interrupt-parent`: 디바이스의 인터럽트 라인이 물리적으로 연결된 인터럽트 컨트롤러 노드를 phandle(`<&label>`)로 지정. 부모 노드에 지정 시 자식 노드들이 상속받습니다.
-- `interrupts`: 인터럽트 지정자(Specifier) 리스트. 형식은 해당 인터럽트 컨트롤러의 `#interrupt-cells` 스펙을 따릅니다.
-- `interrupts-extended`: 인터럽트 소스마다 서로 다른 컨트롤러에 연결될 때 컨트롤러 phandle과 스펙을 묶어서 선언하는 방식.
-  ```dts
-  interrupts-extended = <&gic 0 33 4>, <&gpio1 8 1>;
-  ```
-
-##### ARM Generic Interrupt Controller (GIC)의 3셀 규격 상세
-ARM Cortex-A 기반 시스템(Zynq, Raspberry Pi, i.MX 등)에서 GIC 노드는 `#interrupt-cells = <3>;`을 사용합니다.
-
-```dts
-gic: interrupt-controller@f8f01000 {
-    compatible = "arm,cortex-a9-gic";
-    #interrupt-cells = <3>;
-    interrupt-controller;
-    reg = <0xf8f01000 0x1000>,
-          <0xf8f00100 0x100>;
-};
-```
-
-*GIC 3-Cell Specifier 분석:*
-```dts
-interrupt-parent = <&gic>;
-interrupts = <0 32 4>;
-```
-
-1. **Cell 1: 인터럽트 타입 (Interrupt Type)**
-   - `0` (`GIC_SPI`): Shared Peripheral Interrupt. 주변 장치에서 발생하여 여러 CPU 코어 중 하나 또는 전체로 전달 가능한 인터럽트 (글로벌 페리페럴).
-   - `1` (`GIC_PPI`): Private Peripheral Interrupt. 특정 CPU 코어에 독점적으로 연결된 로컬 인터럽트 (예: 로컬 타이머, Core Performance Monitor).
-   - *(참고: SGI - Software Generated Interrupt는 소프트웨어 IPI로 사용되므로 DTS에 기술하지 않음)*
-2. **Cell 2: 인터럽트 번호 (Interrupt Number)**
-   - `SPI`: 0 ~ 987 (주의: GIC 하드웨어 인터럽트 ID 체계는 32번부터 SPI가 시작하므로, 커널 내부 ID = SPI 번호 + 32).
-   - `PPI`: 0 ~ 15 (하드웨어 인터럽트 ID 16 ~ 31).
-3. **Cell 3: 트리거 방식 플래그 (Trigger Flag & Polarity)**
-   - `1` (`IRQ_TYPE_EDGE_RISING`): 상승 에지 트리거
-   - `2` (`IRQ_TYPE_EDGE_FALLING`): 하강 에지 트리거
-   - `4` (`IRQ_TYPE_LEVEL_HIGH`): 액티브 하이 레벨 트리거 (대부분의 온칩/AXI IP가 채택)
-   - `8` (`IRQ_TYPE_LEVEL_LOW`): 액티브 로우 레벨 트리거
-
----
-
-#### 2.3 `ranges`와 버스 브리지 (Bus Bridge & Address Translation)
-
-##### 버스 브리지 노드(Bus Bridge Node)란?
-- **개념**: 서로 다른 물리 주소 체계, 버스 프로토콜, 또는 주소 비트 폭을 가진 두 버스를 연결해주는 하드웨어 장치입니다.
-  - 예: CPU 내부의 AXI 시스템 버스와 외부 메모리 제어기(EBI, Local Bus), PCIe 호스트 컨트롤러 버스 브리지.
-- 브리지 하위에 달린 디바이스는 브리지 내부의 로컬 주소(Child Bus Address)를 사용하며, CPU는 시스템 물리 주소(Parent Bus Address)를 통해 접근해야 하므로 **주소 변환(Mapping)**이 필수적입니다.
-
-##### `ranges` 속성 문법
-```dts
-ranges = <child-bus-address  parent-bus-address  length>;
-```
-- `child-bus-address`: 자식 노드가 사용하는 시작 로컬 주소 (셀 크기는 현재 노드의 `#address-cells`)
-- `parent-bus-address`: 부모 노드(상위 버스)의 시작 물리 주소 (셀 크기는 부모 노드의 `#address-cells`)
-- `length`: 매핑할 메모리 영역의 크기 (셀 크기는 현재 노드의 `#size-cells`)
-
-##### 1 1:1 매핑 (Identity Mapping)
-```dts
-soc {
-    compatible = "simple-bus";
-    #address-cells = <1>;
-    #size-cells = <1>;
-    ranges; // 빈 ranges 속성: 자식 버스 주소와 부모 버스 주소가 완전히 동일함
-};
-```
-
-##### 2 주소 변환 매핑 (Translation Mapping)
-로컬 버스 내부의 오프셋 주소를 시스템 주소 공간으로 오프셋 시켜 매핑하는 구조입니다.
-```dts
-axi_to_local_bridge {
-    compatible = "vendor,local-bus-bridge";
-    #address-cells = <1>;
-    #size-cells = <1>;
-
-    // 로컬 버스의 0x0000_0000 ~ 0x0001_0000(64KB)을 시스템 물리 주소 0x8000_0000에 매핑
-    ranges = <0x00000000 0x80000000 0x00010000>;
-
-    sram@0 {
-        reg = <0x00000000 0x4000>; // 로컬 0x0 -> 실제 CPU 주소는 0x80000000 매핑
-    };
-};
-```
-
-> [!NOTE]
-> 만약 노드에 `ranges` 속성이 아예 선언되어 있지 않다면, 해당 노드 아래의 자식 장치들은 부모의 주소 공간으로 메모리 맵(MMIO)되지 않음을 뜻합니다. I2C나 SPI 컨트롤러가 대표적이며, 이들의 자식 노드는 메모리 주소가 아닌 채널/슬레이브 ID를 가지므로 `ranges`가 없습니다.
-
----
-
-#### 2.4 핵심 표준 노드 (Standard Well-Known Nodes)
-
-디바이스 트리 루트(`/`) 바로 아래에는 리눅스 부팅과 하드웨어 추상화를 위한 표준 시스템 노드들이 정의됩니다.
-
-| 노드 경로  | 역할 및 구성 요소                                                                                                                                                                                                                                                                                                                                                                 |
-| :--------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/`        | **루트 노드**. 시스템 모델명(`model`), 최상위 호환성 문자열(`compatible`), 최상위 주소 셀 규칙(`\#address-cells`, `\#size-cells`)을 정의.                                                                                                                                                                                                                                         |
-| `/cpus`    | 시스템에 장착된 모든 CPU 코어의 정보를 정의. 코어별 동작 주파수(`clock-frequency`), SMP 코어 부팅 방식(`enable-method = "psci";` 등), L1/L2 캐시 크기 및 토폴로지 설정 포함.                                                                                                                                                                                                      |
-| `/memory`  | 시스템의 실제 물리 RAM 시작 주소 및 용량을 정의.<br>`device_type = "memory";`<br>`reg = <0x00000000 0x40000000>;` (1GB RAM)<br>U-Boot 부트로더가 DRAM 초기화 후 실제 감지된 크기로 이 값을 부팅 직전에 동적으로 수정(Update)하기도 함.                                                                                                                                            |
-| `/chosen`  | 하드웨어가 아닌 **OS 부팅 파라미터 및 환경**을 커널로 전달하기 위한 특수 노드.<br>- `bootargs`: 커널 커맨드라인 파라미터 (`"console=ttyPS0,115200 root=/dev/mmcblk0p2 rw"`)<br>- `stdout-path`: 부팅 초기에 커널 로그를 출력할 기본 시리얼 콘솔 경로 (`&uart0` 또는 `"serial0:115200n8"`)<br>- `linux,initrd-start`, `linux,initrd-end`: 램디스크(RAMDisk) 물리 메모리 적재 주소. |
-| `/aliases` | 길고 복잡한 디바이스 트리 절대 경로 대신 사람이 읽기 쉽고 고정된 식별자를 부여하는 별칭 테이블.<br>예: `serial0 = &uart0;`, `ethernet0 = &gem0;`<br>리눅스 커널은 이 별칭 번호를 참조하여 `/dev/ttyS0`, `eth0` 등의 인덱스를 일관되게 부여함.                                                                                                                                     |
-
----
-
-### 3. Driver와의 연결 메커니즘 (Device Tree to Driver Binding)
-
-#### 3.1 전체 바인딩 시퀀스 (Binding Sequence Lifecycle)
-
-```mermaid
-sequenceDiagram
-    participant Bootloader as 부트로더 (U-Boot)
-    participant KernelInit as 커널 초기화 (Early Setup)
-    participant OFCore as OF Core (of_platform)
-    participant PlatformBus as Platform Bus (Linux Bus Driver)
-    participant Driver as 디바이스 드라이버
-
-    Bootloader->>KernelInit: DTB 물리 주소 포인터 전달
-    KernelInit->>KernelInit: unflatten_device_tree() 호출 (struct device_node 트리 생성)
-    KernelInit->>OFCore: of_platform_default_populate() 호출
-    OFCore->>OFCore: compatible="simple-bus" 등의 자식 노드 순회
-    OFCore->>PlatformBus: struct platform_device 인스턴스 동적 생성 및 등록 (reg, irq -> resource 변환)
-    Driver->>PlatformBus: platform_driver_register() 등록
-    PlatformBus->>PlatformBus: bus_match() -> of_match_device() 수행
-    Note over PlatformBus: DT compatible 문자열 == of_match_table compatible 비교
-    PlatformBus->>Driver: driver->probe(pdev) 호출
-    Driver->>Driver: devm_ioremap_resource(), platform_get_irq() 등으로 HW 제어 시작
-```
-
-1. **DTB 로드 및 언플래트닝 (Unflattening)**:
-   - 부트로더(U-Boot)가 DTB를 메모리에 올리고 R2 레지스터(ARM32) 또는 X0 레지스터(ARM64)에 주소를 담아 커널을 시작합니다.
-   - 커널은 부팅 초기 `unflatten_device_tree()`를 실행하여 직렬화된 Flattened Device Tree(FDT) 바이너리를 C 구조체 링크드 리스트 형태인 `struct device_node` 트리로 메모리에 재구성합니다.
-2. **`platform_device` 동적 인스턴스화**:
-   - 아키텍처 드라이버 초기화 중 `of_platform_default_populate()`가 실행됩니다.
-   - 루트 노드의 자식 노드 중 `compatible` 속성이 있거나 `simple-bus`, `simple-mfd` 속성을 가진 버스 노드의 자식들을 순회하며 `struct platform_device` 구조체를 동적으로 생성합니다.
-   - 이 과정에서 DT의 `reg` 속성은 `IORESOURCE_MEM`, `interrupts` 속성은 `IORESOURCE_IRQ` 타입의 `struct resource` 배열(`pdev->resource`)로 자동 변환됩니다.
-3. **매칭 및 `probe()` 호출**:
-   - `platform_driver_register()`를 통해 드라이버가 등록되면, 커널의 플랫폼 버스 매칭 엔진(`platform_match`)이 동작합니다.
-   - `of_driver_match_device()`가 노드의 `compatible` 속성과 드라이버의 `of_match_table` 문자열들을 비교하여 가장 적합한 매칭을 찾습니다.
-   - 일치하는 항목이 발견되면 드라이버의 `.probe(struct platform_device *pdev)` 함수가 실행됩니다.
-
----
-
-#### 3.2 `of_match_table`과 `MODULE_DEVICE_TABLE`
-
-드라이버는 자신이 지원하는 하드웨어 목록을 `of_device_id` 구조체 배열로 선언합니다.
-
+### DMA Engine & Asynchronous Memory Transfer
+메모리 이동을 CPU가 처리하지 않고, 대신 DMA 하드웨어를 이용하여 CPU 비동기적, 비점유 방식으로 데이터를 전송하는 것
+
+- **`Burst Transfer`**: 연속된 주소에 있는 데이터를 연속으로 전송, 일반적으로 약 4배 빠름
+- **필요한 사례**: 고속 데이터 스트리밍, 네트워크 패킷 처리, PS (Processing System) - PL (Programmable Logic) 간 대용량 데이터 교환
+
+#### DMA 전송 유형 (Consistent vs Streaming)
+- `DMA_MEMCPY`     : mem to mem copy
+- `DMA_MEMSET`     : 메모리 채우기
+- `DMA_SG`         : Scatter-Gather, 비연속 메모리 블록 전송 (흩어져 있는 메모리 블록들을 한곳에 수집/분산)
+- `DMA_CYCLIC`     : 오디오/비디오 등 순환 버퍼 전송
+- `DMA_SLAVE`      : peripheral to mem copy
+- `DMA_INTERLEAVE` : 2차원/인터리브 패턴 전송
+
+#### DMA 메모리 할당 및 캐시 일관성 (Cache Coherency)
+DMA는 **Physical Address**로 메모리에 직접 접근합니다.
+
+**`kmalloc()`을 쓰면 안 되는 이유**:
+1. `kmalloc()` 반환 주소값은 Virtual Address이므로 DMA 컨트롤러에 직접 전달 불가.
+2. **캐시 일관성 문제**:
+   - **CPU 쓰기 $\rightarrow$ DMA 읽기**: 캐시에 있는 수정 내용이 DRAM에 반영되지 않아 이전의 오래된 데이터가 전송됨. $\rightarrow$ CPU 캐시 **Flush** 필요.
+   - **DMA 쓰기 $\rightarrow$ CPU 읽기**: DMA가 DRAM에 새 데이터를 썼지만 CPU 캐시에 이전 데이터가 남아있어 오래된 값을 읽음. $\rightarrow$ CPU 캐시 **Invalidate** 필요.
+
+**일관성 DMA 할당 API (Consistent DMA)**:
 ```c
-##include <linux/module.h>
-##include <linux/platform_device.h>
-##include <linux/of.h>
-
-// 1. 하드웨어별 특화 설정 데이터 정의 (선택 사항)
-struct my_ip_config {
-    int fifo_depth;
-    bool has_dma;
-};
-
-static const struct my_ip_config cfg_v1 = { .fifo_depth = 16, .has_dma = false };
-static const struct my_ip_config cfg_v2 = { .fifo_depth = 64, .has_dma = true };
-
-// 2. of_match_table 선언
-static const struct of_device_id my_driver_dt_ids[] = {
-    { .compatible = "vendor,myip-1.0", .data = &cfg_v1 },
-    { .compatible = "vendor,myip-2.0", .data = &cfg_v2 },
-    { /* Sentinel (끝을 알리는 null 항목) */ }
-};
-
-// 3. 모듈 자동 로딩을 위한 디바이스 테이블 내보내기
-MODULE_DEVICE_TABLE(of, my_driver_dt_ids);
-```
-
-> [!IMPORTANT]
-> **`MODULE_DEVICE_TABLE(of, ...)`의 역할**
-> 드라이버를 커널 모듈(`.ko`)로 빌드할 때, 빌드 도구(`scripts/mod/file2alias.c`)가 이 테이블을 파싱하여 모듈 바이너리의 `.modinfo` 섹션에 `alias=of:N*T*Cvendor,myip-1.0*` 형태의 문자열을 생성합니다.
-> 커널이 DT 노드를 발견하고 `platform_device`를 생성하면 `MODALIAS=of:N...` 환경변수와 함께 `udev` 이벤트를 발생시키고, udev는 `depmod` 인덱스를 조회하여 해당 모듈을 즉시 자동으로 `modprobe`합니다.
-
----
-
-#### 3.3 `struct platform_driver` 구조체와 핵심 멤버
-
-리눅스 커널의 플랫폼 버스 모델에서 드라이버를 정의하는 핵심 구조체는 `<linux/platform_device.h>`에 정의된 `struct platform_driver`입니다.
-
-```c
-struct platform_driver {
-    int (*probe)(struct platform_device *);
-    void (*remove)(struct platform_device *);   // 리눅스 6.11+부터 void 반환 (구버전은 int)
-    void (*shutdown)(struct platform_device *);
-    int (*suspend)(struct platform_device *, pm_message_t state);
-    int (*resume)(struct platform_device *);
-    struct device_driver driver;
-    const struct platform_device_id *id_table;
-    bool prevent_deferred_probe;
-};
-```
-
-##### 1 라이프사이클 및 제어 콜백 함수
-드라이버의 생명주기에 맞춰 커널의 플랫폼 코어가 호출하는 함수 포인터들입니다.
-
-| 멤버                           | 시그니처 / 타입                                                                                       | 설명 및 역할                                                                                                                                                                                                                                                                                                                                         |
-| :----------------------------- | :---------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`.probe`**                   | `int (*probe)(struct platform_device *pdev)`                                                          | **[필수]** 하드웨어 매칭 성공 시 최초 호출되는 진입점.<br>- DT/ACPI 리소스(MMIO 레지스터, IRQ, 클럭, GPIO 등) 획득 및 매핑<br>- 드라이버 내부 상태 구조체(`priv`) 메모리 할당 및 `platform_set_drvdata()`로 저장<br>- 서브시스템(V4L2, IIO, Char dev, Net dev 등) 등록<br>- 성공 시 `0`, 실패 시 음수 에러 코드(예: `-ENOMEM`, `-EPROBE_DEFER`) 반환 |
-| **`.remove`**                  | `void (*remove)(struct platform_device *pdev)`<br>*(구버전: `int`)*                                   | 드라이버 언로드(`rmmod`), 디바이스 강제 언바인딩, DTO 제거 등으로 장치가 분리될 때 호출.<br>- 등록했던 서브시스템 등록 해제<br>- 하드웨어 동작 정지 및 인터럽트 비활성화<br>- `devm_*` 계열 미사용 리소스의 명시적 해제                                                                                                                              |
-| **`.shutdown`**                | `void (*shutdown)(struct platform_device *pdev)`                                                      | 시스템 종료(`poweroff`) 또는 재부팅(`reboot`) 시 커널이 호출.<br>- 진행 중인 DMA 전송 중지, FIFO 비우기, HW 칩 슬립 모드 전환 등 시스템 안전 상태 확보                                                                                                                                                                                               |
-| **`.suspend`** / **`.resume`** | `int (*suspend)(struct platform_device *, pm_message_t)`<br>`int (*resume)(struct platform_device *)` | 레거시 전원 관리 콜백 (System Sleep/Wakeup).<br>*현재는 후술할 `driver.pm` (`dev_pm_ops`) 사용이 강력히 권장됨.*                                                                                                                                                                                                                                     |
-
-##### 2 `driver` (`struct device_driver`) 공통 메타데이터
-리눅스 디바이스 모델의 최상위 베이스 드라이버 구조체로, 버스 공통 속성과 매칭 테이블을 보관합니다.
-
-```c
-.driver = {
-    .name = "my-custom-driver",
-    .of_match_table = my_of_match,
-    .pm = &my_dev_pm_ops,
-    .owner = THIS_MODULE,
-}
-```
-
-| `driver` 하위 멤버      | 타입                              | 설명                                                                                                                                                                         |
-| :---------------------- | :-------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **`.name`**             | `const char *`                    | **[필수]** 드라이버 이름. sysfs 경로(`/sys/bus/platform/drivers/<name>`)에 디렉토리로 노출되며, DT가 없는 레거시 디바이스와 이름 기반 매칭 시 비교 키로 사용됨.              |
-| **`.of_match_table`**   | `const struct of_device_id *`     | **[Device Tree 연동 핵심]** 디바이스 트리의 `compatible` 속성과 매칭할 목록 포인터. 커널은 이 테이블을 최우선으로 검사하여 probe를 호출함.                                   |
-| **`.acpi_match_table`** | `const struct acpi_device_id *`   | x86이나 ARM64 서버 등 ACPI 펌웨어를 사용하는 시스템에서 디바이스를 매칭하기 위한 테이블.                                                                                     |
-| **`.pm`**               | `const struct dev_pm_ops *`       | **모던 전원 관리 구조체**. `suspend`, `resume`, `runtime_suspend`, `runtime_resume` 등 세분화된 전원 관리 함수들을 묶어서 지정.                                              |
-| **`.owner`**            | `struct module *`                 | 모듈의 소유자(보통 `THIS_MODULE`). 드라이버가 디바이스와 바인딩되어 동작 중일 때 커널 모듈이 메모리에서 임의로 언로드되는 것을 방지하기 위해 참조 카운트(`refcount`)를 관리. |
-| **`.groups`**           | `const struct attribute_group **` | 디바이스 등록 시 sysfs 노드에 자동으로 노출할 속성(Attribute) 파일들의 그룹 배열.                                                                                            |
-
-##### 3 기타 플랫폼 특화 멤버
-- **`id_table` (`const struct platform_device_id *`)**:
-  - 디바이스 트리(DT)를 사용하지 않는 전통적인(Legacy) x86이나 임베디드 보드 파일 방식에서, 장치 이름과 드라이버 전용 식별자(`driver_data`)를 매칭할 때 사용합니다.
-- **`prevent_deferred_probe` (`bool`)**:
-  - `true`로 설정하면 클럭이나 레귤레이터, GPIO 컨트롤러가 아직 초기화되지 않아 드라이버 probe 중 `-EPROBE_DEFER`가 반환될 때, 큐에 등록하여 나중에 재시도하지 않고 즉시 초기화 실패로 처리합니다.
-
-##### 4 등록 및 해제 편의 매크로
-보일러플레이트 코드(`init`, `exit`)를 줄이기 위해 커널은 매크로를 제공합니다.
-
-```c
-// [수동 등록 방식]
-static int __init my_driver_init(void) {
-    return platform_driver_register(&my_platform_driver);
-}
-static void __exit my_driver_exit(void) {
-    platform_driver_unregister(&my_platform_driver);
-}
-module_init(my_driver_init);
-module_exit(my_driver_exit);
-
-// [최신 표준 매크로] - 위 10줄을 한 줄로 대체!
-module_platform_driver(my_platform_driver);
-```
-
----
-
-#### 3.4 커널 핵심 파싱 API 및 실전 드라이버 코드
-
-##### 1 필수 OF & 플랫폼 API 명세
-- `int of_property_read_u32(const struct device_node *np, const char *propname, u32 *out_value)`
-  - 지정한 노드에서 32비트 단일 정수 속성 값을 읽어옵니다. (성공 시 0 반환)
-- `int of_property_read_string(const struct device_node *np, const char *propname, const char **out_string)`
-  - 지정한 노드에서 문자열 속성을 읽어 포인터로 전달합니다.
-- `bool of_property_read_bool(const struct device_node *np, const char *propname)`
-  - 해당 빈 속성(Flag)이 존재하는지 여부를 boolean(`true`/`false`)으로 반환합니다.
-- `struct resource *platform_get_resource(struct platform_device *pdev, unsigned int type, unsigned int num)`
-  - `pdev`에서 `num`번째 `IORESOURCE_MEM` 또는 `IORESOURCE_IRQ` 리소스를 가져옵니다.
-- `void __iomem *devm_ioremap_resource(struct device *dev, const struct resource *res)`
-  - **현대 리눅스 표준 MMIO 매핑 API**: `request_mem_region()`(자원 충돌 검사 및 점유)과 `ioremap()`(가상 주소 변환)을 일괄 수행하며, 드라이버 언로드(`remove`) 시 자동으로 해제(`devm_`)합니다.
-- `int platform_get_irq(struct platform_device *pdev, unsigned int num)`
-  - 디바이스 트리의 `interrupts` 속성을 리눅스 커널 가상 IRQ 번호로 변환하여 반환합니다.
-
-##### 2 실전 예제: DTS 노드와 드라이버 `probe` 구현
-**Device Tree 노드:**
-```dts
-axi_custom_dev: custom_dev@43c00000 {
-    compatible = "vendor,my-axi-dev";
-    reg = <0x43c00000 0x10000>;
-    interrupt-parent = <&gic>;
-    interrupts = <0 29 4>;
-    vendor,clock-freq = <100000000>;
-    vendor,enable-test-mode;
-};
-```
-
-**커널 드라이버 소스코드:**
-```c
-##include <linux/module.h>
-##include <linux/platform_device.h>
-##include <linux/io.h>
-##include <linux/interrupt.h>
-##include <linux/of.h>
-
-struct custom_dev_priv {
-    void __iomem *base;
-    int irq;
-    u32 clk_freq;
-    bool test_mode;
-};
-
-static irqreturn_t custom_dev_irq_handler(int irq, void *dev_id) {
-    // 인터럽트 처리 루틴
-    return IRQ_HANDLED;
-}
-
-static int custom_dev_probe(struct platform_device *pdev) {
-    struct device *dev = &pdev->dev;
-    struct custom_dev_priv *priv;
-    struct resource *res;
-    int ret;
-
-    dev_info(dev, "Probing custom device...\n");
-
-    priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-    if (!priv) return -ENOMEM;
-
-    // 1. MMIO 주소 획득 및 매핑
-    res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-    priv->base = devm_ioremap_resource(dev, res);
-    if (IS_ERR(priv->base))
-        return PTR_ERR(priv->base);
-
-    // 2. IRQ 획득 및 핸들러 등록
-    priv->irq = platform_get_irq(pdev, 0);
-    if (priv->irq < 0) return priv->irq;
-
-    ret = devm_request_irq(dev, priv->irq, custom_dev_irq_handler,
-                           0, dev_name(dev), priv);
-    if (ret) {
-        dev_err(dev, "Failed to request IRQ %d\n", priv->irq);
-        return ret;
-    }
-
-    // 3. OF 커스텀 속성 파싱
-    ret = of_property_read_u32(dev->of_node, "vendor,clock-freq", &priv->clk_freq);
-    if (ret) priv->clk_freq = 50000000; // 기본값
-
-    priv->test_mode = of_property_read_bool(dev->of_node, "vendor,enable-test-mode");
-
-    platform_set_drvdata(pdev, priv);
-    dev_info(dev, "Successfully initialized at 0x%pK, IRQ %d\n", priv->base, priv->irq);
-    return 0;
-}
-
-static void custom_dev_remove(struct platform_device *pdev) {
-    dev_info(&pdev->dev, "Removing custom device\n");
-    // devm_* 함수를 사용했으므로 ioremap, irq, kzalloc은 자동 정리됨
-}
-
-static const struct of_device_id custom_dev_of_match[] = {
-    { .compatible = "vendor,my-axi-dev", },
-    { /* sentinel */ }
-};
-MODULE_DEVICE_TABLE(of, custom_dev_of_match);
-
-static struct platform_driver custom_dev_driver = {
-    .probe = custom_dev_probe,
-    .remove = custom_dev_remove,
-    .driver = {
-        .name = "custom-axi-dev",
-        .of_match_table = custom_dev_of_match,
-    },
-};
-
-module_platform_driver(custom_dev_driver);
-MODULE_LICENSE("GPL");
-```
-
----
-
-### 4. Device Tree Overlay (DTO) 완벽 가이드
-
-#### 4.1 DTO의 개념과 필요성
-
-- **기존 DTB의 한계**: 부팅 시점에 커널 메모리에 로드되어 정적으로 고정됩니다.
-- **DTO(Device Tree Overlay)의 목적**: 시스템이 부팅되어 가동 중인 **런타임(Runtime)** 상태에서 하드웨어가 변경되거나 동적으로 추가/제거될 때, 메인 DTB를 수정하지 않고 차분(Overlay Patch) 파일(`.dtbo`)을 동적으로 병합하거나 분리합니다.
-- **주요 활용 분야**:
-  - **FPGA Dynamic Reconfiguration (Zynq / FPGA SoC)**: PL(Programmable Logic)에 새로운 AXI IP 코어를 다운로드할 때 드라이버를 즉시 연결.
-  - **확장 쉴드 / HAT**: Raspberry Pi HAT, BeagleBone Cape 등 확장 커넥터에 새 보드가 장착되었을 때 핀멀티플렉싱(Pinmux) 및 I2C/SPI 버스 장치 활성화.
-
----
-
-#### 4.2 핵심 원리 및 커널 링킹 메커니즘
-
-```mermaid
-flowchart TD
-    subgraph Base_DTB["1. Base DTB (컴파일 옵션: -@)"]
-        BaseNodes["Base Nodes"]
-        Symbols["__symbols__ 노드<br>(레이블 문자열 -> phandle 주소 색인)"]
-    end
-
-    subgraph DTBO["2. DTBO (Overlay Blob)"]
-        Fragments["fragment@0 { __overlay__ { ... } }"]
-        Fixups["__fixups__ 노드<br>(외부 레이블 참조 목록)"]
-        LocalFixups["__local_fixups__"]
-    end
-
-    subgraph Runtime_Kernel["3. 리눅스 커널 오버레이 엔진 (of_overlay)"]
-        Resolver["심볼 해석 (Symbol Resolver)<br>__fixups__와 __symbols__ 매핑"]
-        MergeTree["Base Tree에 Overlay 노드 삽입"]
-        Populate["of_platform_populate() 실행<br>새 platform_device 생성"]
-        Probe["드라이버 probe() 호출"]
-    end
-
-    Base_DTB --> Resolver
-    DTBO --> Resolver
-    Resolver --> MergeTree --> Populate --> Probe
-```
-
-1. **Base DTB 심볼 지원 (`dtc -@`)**:
-   - 오버레이가 베이스 트리의 특정 노드를 참조하려면 레이블 정보가 남아 있어야 합니다.
-   - `dtc -@` 옵션으로 빌드하면 DTB 내부에 `__symbols__`라는 특별한 노드가 생성되어, 모든 레이블의 원본 경로가 텍스트로 보존됩니다.
-2. **DTBO 링킹 정보 생성 (`__fixups__`)**:
-   - 오버레이 파일(`*.dtso`)을 컴파일할 때 외부 레이블(예: `<&axi_bus>`)은 즉시 phandle 정수로 확정될 수 없습니다.
-   - DTC는 미해결된 외부 참조를 `__fixups__` 노드에 기록하고, 오버레이 내부의 로컬 phandle은 `__local_fixups__`에 기록합니다.
-3. **런타임 오버레이 적용 단계**:
-   - 사용자가 커널에 DTBO 바이너리를 전달하면 커널 내부의 `of_resolve_phandles()`가 동작합니다.
-   - 오버레이의 `__fixups__`를 Base DTB의 `__symbols__`와 대조하여 실제 런타임 phandle 값을 채워 넣습니다.
-   - 이후 Base 트리의 대상 노드(`target`)에 `__overlay__`의 자식 노드와 속성을 추가하고, 새 노드에 대해 `of_platform_populate()`를 호출하여 드라이버의 `probe()`를 자동으로 유도합니다.
-
----
-
-##### 4.3 DTSO 문법과 실전 작성법
-
-###### 1 클래식 Fragment 문법 (Legacy / Standard)
-```dts
-/dts-v1/;
-/plugin/; // 오버레이 소스임을 선언
-
-/ {
-    // 0번 오버레이 조각
-    fragment@0 {
-        // 적용할 대상 노드 지정 (레이블 기반)
-        target = <&amba>;
-        
-        // 레이블이 없을 경우 절대 경로 지정 가능
-        // target-path = "/amba";
-
-        __overlay__ {
-            #address-cells = <1>;
-            #size-cells = <1>;
-
-            // amba 버스 하위에 새롭게 추가할 하드웨어 노드
-            my_fpga_timer: timer@43c00000 {
-                compatible = "vendor,my-timer-1.0";
-                reg = <0x43c00000 0x1000>;
-                interrupt-parent = <&gic>;
-                interrupts = <0 30 4>;
-                status = "okay";
-            };
-        };
-    };
-};
-```
-
-###### 2 최신 신택틱 슈가 문법 (Modern DTC Syntax)
-최신 DTC 컴파일러는 가독성을 높이기 위해 `fragment` 구문 없이 C++ 네임스페이스 확장처럼 직접 레이블을 선언하는 문법을 지원합니다.
-```dts
-/dts-v1/;
-/plugin/;
-
-// amba 노드에 직접 자식 노드를 삽입
-&amba {
-    #address-cells = <1>;
-    #size-cells = <1>;
-
-    my_fpga_timer: timer@43c00000 {
-        compatible = "vendor,my-timer-1.0";
-        reg = <0x43c00000 0x1000>;
-        interrupt-parent = <&gic>;
-        interrupts = <0 30 4>;
-        status = "okay";
-    };
-};
-```
-
----
-
-##### 4.4 런타임 DTO 적용 및 해제 실무 (ConfigFS)
-
-리눅스 커널은 ConfigFS를 통해 유저스페이스에서 쉘 명령어로 DTO를 적용하고 언로드할 수 있는 표준 인터페이스를 제공합니다.
-
-###### 컴파일
-```bash
-### 오버레이 소스(.dtso)를 DTBO(.dtbo)로 컴파일 (-@ 필수)
-dtc -@ -I dts -O dtb -o my_overlay.dtbo my_overlay.dtso
-```
-
-###### 런타임 적용 (Loading)
-```bash
-### 2. configfs 마운트 확인 (대부분 자동 마운트됨)
-mount -t configfs none /sys/kernel/config
-
-### 3. overlays 디렉토리 아래에 새 인스턴스 디렉토리 생성
-mkdir /sys/kernel/config/device-tree/overlays/my_ip_overlay
-
-### 4. dtbo 바이너리를 configfs 노드로 복사
-cat my_overlay.dtbo > /sys/kernel/config/device-tree/overlays/my_ip_overlay/dtbo
-
-### -> 이 순간 커널이 DTBO를 파싱하여 트리를 병합하고, 호환되는 디바이스 드라이버 probe()가 호출됨!
-### dmesg 명령어로 드라이버 초기화 로그 확인
-dmesg | tail -n 20
-```
-
-###### 런타임 해제 (Unloading / Hot-Unplug)
-```bash
-### 디렉토리를 제거하면 커널이 오버레이를 해제하고 드라이버 remove()를 호출함
-rmdir /sys/kernel/config/device-tree/overlays/my_ip_overlay
+dma_addr_t dma_handle;
+void *vaddr = dma_alloc_coherent(dev, size, &dma_handle, GFP_KERNEL);
+// vaddr: CPU가 접근하는 비캐시(Uncached) 가상 주소
+// dma_handle: DMA 컨트롤러 레지스터에 기록할 물리 주소
+
+dma_free_coherent(dev, size, vaddr, dma_handle);
 ```
 
 ---

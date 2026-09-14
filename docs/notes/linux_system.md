@@ -97,6 +97,7 @@
       - [Device Tree 구조 및 노드 파싱 (DTS/DTB)](#device-tree-구조-및-노드-파싱-dtsdtb)
         - [1. Device Tree 기본 개념 및 도입 배경](#1-device-tree-기본-개념-및-도입-배경)
         - [2. 핵심 용어 및 컴파일 체계](#2-핵심-용어-및-컴파일-체계)
+          - [DTC 컴파일](#dtc-컴파일)
         - [3. 기본 DTS 문법 및 노드 구조](#3-기본-dts-문법-및-노드-구조)
           - [노드 및 속성 명명 규칙](#노드-및-속성-명명-규칙)
           - [프로퍼티(Property) 데이터 타입](#프로퍼티property-데이터-타입)
@@ -110,11 +111,13 @@
         - [2. `of_match_table`과 `MODULE_DEVICE_TABLE`](#2-of_match_table과-module_device_table)
         - [3. `struct platform_driver` 구조체와 핵심 멤버](#3-struct-platform_driver-구조체와-핵심-멤버)
         - [4. 커널 핵심 파싱 API 및 실전 드라이버 코드](#4-커널-핵심-파싱-api-및-실전-드라이버-코드)
-      - [Device Tree Overlay (DTO) 완벽 가이드](#device-tree-overlay-dto-완벽-가이드)
+      - [Device Tree Overlay (DTO)](#device-tree-overlay-dto)
         - [1. DTO의 개념과 필요성](#1-dto의-개념과-필요성)
         - [2. 핵심 원리 및 커널 링킹 메커니즘](#2-핵심-원리-및-커널-링킹-메커니즘)
         - [3. DTSO 문법 (Modern Syntax)](#3-dtso-문법-modern-syntax)
         - [4. 런타임 DTO 적용 및 해제 (ConfigFS)](#4-런타임-dto-적용-및-해제-configfs)
+      - [of\_\* API](#of_-api)
+      - [system-user.dtsi를 이용한 커스터마이징](#system-userdtsi를-이용한-커스터마이징)
   - [커널 인터럽트 \& 블로킹 I/O (Interrupt \& Blocking I/O)](#커널-인터럽트--블로킹-io-interrupt--blocking-io)
     - [커널 인터럽트 처리 체계와 Top/Bottom Half 개념](#커널-인터럽트-처리-체계와-topbottom-half-개념)
     - [대기 큐(Wait Queue)와 블로킹 I/O (Blocking I/O)](#대기-큐wait-queue와-블로킹-io-blocking-io)
@@ -180,6 +183,8 @@
     - [인터럽트 분할 처리 (Top-Half \& Bottom-Half) 원리](#인터럽트-분할-처리-top-half--bottom-half-원리)
     - [I/O 모델 비교](#io-모델-비교)
   - [운영체제 커널 구조 이론 (OS Kernel Architecture Theory)](#운영체제-커널-구조-이론-os-kernel-architecture-theory)
+- [memo](#memo)
+  - [`devm_*` Managed Resource API](#devm_-managed-resource-api)
 ---
 
 # 1. Linux basic & Application Programming
@@ -916,7 +921,7 @@ KERNEL=="led_device", SUBSYSTEM="led_device", MODE="0666"
 ### Driver Private Data Context (`private_data` & `container_of`)
 
 #### `struct file`의 `private_data`
-동일한 드라이버가 여러 개의 물리적 디바이스 인스턴스를 관리할 때, open 시점에 각 인스턴스의 전용 상태 구조체를 `file->private_data`에 저장하여 read/write/ioctl 등에서 공통으로 활용합니다
+동일한 드라이버가 여러 개의 물리적 디바이스 인스턴스를 관리할 때, open 시점에 각 인스턴스의 전용 상태/데이터 구조체를 `file->private_data`에 저장하여 read/write/ioctl 등에서 공통으로 활용합니다
 
 #### `container_of()` 매크로
 구조체의 **특정 멤버 변수의 포인터 주소**로부터 해당 **구조체 전체의 시작 주소**를 역산해내는 커널 핵심 매크로입니다
@@ -1011,6 +1016,12 @@ flowchart TD
     end
 ```
 
+
+- **Device Tree의 설계 원칙**:
+  1. **하드웨어의 상태를 기술하라**: 설정하는 것이 아니다.
+  2. **OS에 독립적이다**: 커널 특유의 설정이 들어가면 안된다.
+  3. **하드웨어 통합을 기술하라**: 내부 레지스터 동작은 드라이버가 처리한다. DT는 어떻게 연결되어 있는지만 기술한다.
+
 ##### 2. 핵심 용어 및 컴파일 체계
 | 용어       | 풀네임 (Full Name)                                | 설명 및 역할                                                                                                                                  |
 | :--------- | :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1019,6 +1030,11 @@ flowchart TD
 | **DTB**    | **Device Tree Blob (Flattened Device Tree, FDT)** | DTC 컴파일러를 통해 컴파일된 바이너리 형태의 디바이스 트리 파일 (`.dtb`). 부트로더가 DRAM에 적재 후 커널에 메모리 주소를 전달.                |
 | **DTC**    | **Device Tree Compiler**                          | 텍스트 파일인 DTS를 바이너리 DTB로 변환(또는 역변환 디컴파일 `dtb -> dts`)하는 전용 컴파일러 도구.                                            |
 | **OF API** | **Open Firmware API**                             | PowerPC Open Firmware 규격에서 유래한 리눅스 커널 내부의 디바이스 트리 파싱 및 노드 탐색 함수군 (`of_property_read_*`, `of_find_node_*` 등).  |
+
+###### DTC 컴파일
+
+TODO: here.
+
 
 ##### 3. 기본 DTS 문법 및 노드 구조
 디바이스 트리는 루트 노드(`/`)를 시작점으로 하는 계층적 트리 구조(Tree Structure)를 가집니다.
@@ -1087,7 +1103,7 @@ flowchart TD
 
 ###### 핵심 공통 표준 속성
 - **`compatible`**: 디바이스 노드와 리눅스 커널 드라이버를 연결하는 **가장 핵심적인 키(Key)**. `"제조사,모델명"` 형식.
-- **`status`**: 하드웨어 활성화 상태 (`"okay"`: 정상 활성화, `"disabled"`: 사용 안 함 / 드라이버 probe 방지).
+- **`status`**: 하드웨어 활성화 상태 (`"okay"`: 정상 활성화, `"disabled"`: 사용 안 함 / 드라이버 probe 방지, `"reserved"`: 예약됨, `"fail"`: 오류 ).
 - **`phandle`**: 노드 간 상호 연결(인터럽트 컨트롤러 참조, 클럭/GPIO 참조 등)을 위한 내부 32비트 포인터 ID.
 
 ##### 4. `reg` 속성과 주소 지정 모델 (`#address-cells`, `#size-cells`)
@@ -1169,7 +1185,7 @@ axi_to_local_bridge {
 ##### 1. 전체 바인딩 시퀀스 (Binding Sequence Lifecycle)
 ```mermaid
 sequenceDiagram
-    participant Bootloader as 부트로더 (U-Boot)
+  participant Bootloader as 부트로더 (U-Boot)
     participant KernelInit as 커널 초기화 (Early Setup)
     participant OFCore as OF Core (of_platform)
     participant PlatformBus as Platform Bus (Linux Bus Driver)
@@ -1188,7 +1204,7 @@ sequenceDiagram
 ```
 
 1. **DTB 로드 및 언플래트닝**: 부트로더가 DTB를 메모리에 적재 후 커널에 포인터 전달 $\rightarrow$ `unflatten_device_tree()`로 `struct device_node` 트리 구성.
-2. **`platform_device` 동적 생성**: `of_platform_default_populate()`가 `simple-bus` 하위 노드들을 순회하며 `struct platform_device` 생성 (reg/irq를 `struct resource`로 변환).
+2. **`platform_device` 동적 생성**: `of_platform_default_populate()`가 루트 노드의 직계 자식 중 `compatible`을 가진 노드와 `compatible`이 `simple-bus`인 노드의 하위 노드들을 순회하며 `struct platform_device` 생성 (reg/irq를 `struct resource`로 변환).
 3. **매칭 및 `probe()` 호출**: `platform_driver_register()` 시 `of_match_table`의 compatible과 노드의 compatible을 비교하여 일치 시 `.probe()` 호출.
 
 ##### 2. `of_match_table`과 `MODULE_DEVICE_TABLE`
@@ -1218,7 +1234,15 @@ struct platform_driver {
     bool prevent_deferred_probe;
 };
 ```
-- **`.probe`**: 하드웨어 매칭 시 리소스 획득, `devm_ioremap_resource()`, 인터럽트 등록, `platform_set_drvdata()`.
+- **`.probe`**
+  - 하드웨어 매칭 시 리소스 획득
+  - `devm_ioremap_resource()`: 주변장치 물리 주소를 매핑.
+  - 인터럽트 등록
+  - `platform_set_drvdata()`: 드라이버 인스턴스의 독립 변수를 file->private_data에 저장
+  - return value
+    - `-ENODEV`: 디바이스 없음.
+    - `-ENOMEM`: 메모리 부족.
+    - `-EPROBE_DEFER`: 의존 리소스 준비 안됨. 보류(deffered) 목록에 넣고 다른 드라이버가 등록될 때마다 재시도.
 - **`.remove`**: 모듈 언로드 시 자원 해제.
 - **`module_platform_driver(my_driver)`**: init/exit 등록 편의 매크로.
 
@@ -1305,7 +1329,7 @@ MODULE_LICENSE("GPL");
 
 ---
 
-#### Device Tree Overlay (DTO) 완벽 가이드
+#### Device Tree Overlay (DTO)
 
 ##### 1. DTO의 개념과 필요성
 - **기존 DTB의 한계**: 부팅 시점에 커널 메모리에 로드되어 정적으로 고정됩니다.
@@ -1347,7 +1371,7 @@ flowchart TD
 ##### 3. DTSO 문법 (Modern Syntax)
 ```dts
 /dts-v1/;
-/plugin/;
+/plugin/;   // overlay임을 선언
 
 &amba {
     #address-cells = <1>;
@@ -1375,6 +1399,20 @@ cat my_overlay.dtbo > /sys/kernel/config/device-tree/overlays/my_ip_overlay/dtbo
 # 3. 런타임 해제 (Hot-Unplug)
 rmdir /sys/kernel/config/device-tree/overlays/my_ip_overlay
 ```
+
+#### of_* API
+
+임베디드 리눅스 시스템에서 디바이스 트리(Device Tree) 프로토콜이 원래 IEEE 1275 표준인 'Open Firmware' 사양에서 유래되었기 때문에, 디바이스 트리를 다루는 모든 커널 API와 구조체에는 of_라는 접두사가 붙게 되었다.
+
+#### system-user.dtsi를 이용한 커스터마이징
+
+TODO: here.
+
+DTC는 같은 노드가 여러 번 선언되면 나중에 선언된 속성이 이전 값을 덮어쓴다.
+
+- `/delete-property/`: 기존 속성 제거.
+- `/delete-node/`: 기존 노드 제거.
+
 
 ---
 
@@ -2180,3 +2218,28 @@ $$\text{CAS}(\text{address}, \text{expected\_val}, \text{new\_val})$$
   - 커널은 최소한의 기능(IPC, 기본 가상 메모리, 스케줄링)만 담당하고, 드라이버와 파일 시스템은 유저 공간 서버 프로세스로 분리
   - **모듈성과 안정성이 매우 높음**
   - 잦은 유저-커널 컨텍스트 스위칭 및 IPC 오버헤드로 인한 성능 비용 발생
+
+
+
+
+# memo
+
+## `devm_*` Managed Resource API 
+
+TODO: here
+device managed 접두사가 붙은 API는 할당한 자원들을 `struct device`에 연결하고 드라이버 제거 (`exit`) 또는 `probe()` 실패 시 *커널이 자원을 자동으로 역순으로 해제*해 준다.
+
+| default API                      | devm_* API                | desc                        |
+| -------------------------------- | ------------------------- | --------------------------- |
+| ioremap()                        | devm_ioremap()            | 물리-가상 주소 매핑         |
+| ioremap() + request_mem_region() | devm_ioremap_resource()   | 메모리 영역 매핑            |
+| request_irq()                    | devm_request_irq()        | 인트럽트 핸들러 등록        |
+| kmalloc()                        | devm_kmalloc()            | 커널 메모리 할당            |
+| kzalloc()                        | devm_kzalloc()            | 커널 메모리 할당 (0 초기화) |
+| kcalloc()                        | devm_kcalloc()            | 커널 배열 메모리 할당       |
+| clk_get()                        | devm_clk_get()            | 클럭 리소스 획득            |
+| gpio_request()                   | devm_gpio_request()       | GPIO 핀 획득                |
+| dma_alloc_coherent()             | devm_dma_alloc_coherent() | DMA 일관성 메모리 할당      |
+
+---
+

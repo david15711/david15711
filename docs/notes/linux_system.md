@@ -28,6 +28,7 @@
     - [Daemon Processes \& systemd](#daemon-processes--systemd)
       - [데몬 프로세스 (Daemon Process)](#데몬-프로세스-daemon-process)
       - [systemd 서비스 및 모듈 자동 로드](#systemd-서비스-및-모듈-자동-로드)
+      - [sysvinit](#sysvinit)
   - [프로세스 간 통신(IPC) \& 동기화 (IPC \& Synchronization)](#프로세스-간-통신ipc--동기화-ipc--synchronization)
     - [유저 레벨 뮤텍스 \& 조건 변수](#유저-레벨-뮤텍스--조건-변수)
       - [뮤텍스 (Mutex)](#뮤텍스-mutex)
@@ -92,6 +93,8 @@
       - [`struct file`의 `private_data`](#struct-file의-private_data)
       - [`container_of()` 매크로](#container_of-매크로)
     - [`ioctl` Interface](#ioctl-interface)
+    - [Kernel Timer](#kernel-timer)
+    - [I/O Multiplexing](#io-multiplexing)
     - [GPIO Subsystem \& Hardware Control](#gpio-subsystem--hardware-control)
     - [Device Tree \& Platform Driver](#device-tree--platform-driver)
       - [Device Tree 구조 및 노드 파싱 (DTS/DTB)](#device-tree-구조-및-노드-파싱-dtsdtb)
@@ -153,6 +156,7 @@
       - [`mmap`의 동작 원리 및 주소 공간 매핑](#mmap의-동작-원리-및-주소-공간-매핑)
       - [드라이버에서의 `nopage`/`fault` 핸들러 구현](#드라이버에서의-nopagefault-핸들러-구현)
     - [DMA Engine \& Asynchronous Memory Transfer](#dma-engine--asynchronous-memory-transfer)
+      - [DMA Engine subsystem API](#dma-engine-subsystem-api)
       - [DMA 전송 유형 (Consistent vs Streaming)](#dma-전송-유형-consistent-vs-streaming)
       - [DMA 메모리 할당 및 캐시 일관성 (Cache Coherency)](#dma-메모리-할당-및-캐시-일관성-cache-coherency)
 - [3. 컴퓨터 과학 배경지식 (Computer Science Basic)](#3-컴퓨터-과학-배경지식-computer-science-basic)
@@ -407,6 +411,15 @@ int pthread_detach(pthread_t thread);
 - 서비스 관리: `.service` 단위 파일 정의 (`systemctl start/enable myservice`)
 - 커널 모듈 자동 로드: 부팅 시 모듈을 자동으로 `insmod/modprobe` 하도록 `/etc/modules-load.d/*.conf` 디렉터리에 로드할 모듈 이름을 기술합니다
 
+#### sysvinit
+TODO: sysvinit
+
+init으로 알려진 기본 시스템 초기화 프로세스.
+
+/etc/init.d 또는 /etc/rc.local의 쉘 스크립트를 통해서 처리한다.
+/etc/rc*.d 폴더 내부에 있는 "[S|K][0-9][0-9]이름" 형태의 파일을 우선순위대로 실행한다.
+
+
 ---
 
 ## 프로세스 간 통신(IPC) & 동기화 (IPC & Synchronization)
@@ -447,7 +460,14 @@ pthread_mutex_unlock(&mutex);
 ---
 
 ### 메모리 매핑 I/O (`mmap` & `/dev/zero`)
-파일이나 하드웨어 디바이스 메모리를 프로세스의 가상 주소 공간에 직접 매핑합니다. 매번 `read()` / `write()` 시스템 콜을 호출하여 커널-유저 간 버퍼 복사를 거치지 않고 포인터 접근으로 I/O를 수행하여 고성능을 제공합니다
+파일이나 하드웨어 디바이스 메모리를 프로세스의 가상 주소 공간에 직접 매핑합니다. 매번 `read()` / `write()` 시스템 콜을 호출하여 커널-유저 간 버퍼 복사를 거치지 않고 포인터 접근으로 I/O를 수행하여 고성능을 제공합니다.
+드라이버는 정의한 .mmap 핸들러를 정의하고 유저 프로세스에서 mmap을 요청하면 처리.
+
+1. mmap 호출 [USER]
+2. 커널이 VMA 생성, 유저 프로세스 가상 주소 공간에서 빈 영역을 찾아 vm_area_struct 생성 [KERNEL]
+3. 드라이버의 .mmap 호출, 실제 매핑할 내용은 위임
+4. remap_pfn_range() 실행
+5. 복귀하여 가상 주소 반환 [USER]
 
 ```c
 #include <sys/mman.h>
@@ -976,6 +996,23 @@ static long my_driver_ioctl(struct file *file, unsigned int cmd, unsigned long a
 
 ---
 
+### Kernel Timer
+
+TODO: kernel timer
+- Kernel의 시간 관리 체계 `jiffies`, `HZ`
+- `timer_list` API
+- 타이머 콜백의 Handler Context(softirq) 허용 작업과 금지 작업
+- Self-reloading timer
+
+### I/O Multiplexing
+
+TODO: I/O Multiplexing
+- poll
+- select
+- epoll
+
+
+
 ### GPIO Subsystem & Hardware Control
 하드웨어 Pin 레지스터 주소와 Bit Mask를 디바이스 드라이버가 직접 제어하지 않고, 커널이 제공하는 추상화 계층을 통해 GPIO 제어를 수행하는 서브시스템
 - **레거시 sysfs 방식**: `/sys/class/gpio/export`에 Pin 번호를 써서 개방 후 `/sys/class/gpio/gpioX/direction` 및 `value` 제어
@@ -1033,7 +1070,7 @@ flowchart TD
 
 ###### DTC 컴파일
 
-TODO: here.
+TODO: DTC
 
 
 ##### 3. 기본 DTS 문법 및 노드 구조
@@ -1406,7 +1443,7 @@ rmdir /sys/kernel/config/device-tree/overlays/my_ip_overlay
 
 #### system-user.dtsi를 이용한 커스터마이징
 
-TODO: here.
+TODO: dtsi overriding
 
 DTC는 같은 노드가 여러 번 선언되면 나중에 선언된 속성이 이전 값을 덮어쓴다.
 
@@ -1976,6 +2013,26 @@ struct vm_area_struct {
 - **`Burst Transfer`**: 연속된 주소에 있는 데이터를 연속으로 전송, 일반적으로 약 4배 빠름
 - **필요한 사례**: 고속 데이터 스트리밍, 네트워크 패킷 처리, PS (Processing System) - PL (Programmable Logic) 간 대용량 데이터 교환
 
+#### DMA Engine subsystem API
+
+TODO: DMA engine
+
+| 단계                    | 주요 API / 함수                                         | 주체              | 실제 동작                                                                                                                          |
+| ----------------------- | ------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **1. 요청**             | `read()`, `write()`, `ioctl()`                          | **유저 앱**       | 애플리케이션이 시스템 콜을 호출하여 커널에 데이터 입출력을 요청합니다.                                                             |
+| **2. 메모리 확보 & 핀** | `get_user_pages_fast()`                                 | **드라이버**      | 유저 버퍼가 DMA 전송 동안 스왑아웃(Swap-out)되지 않도록 메모리 페이지를 물리 메모리에 고정(Lock)합니다.                            |
+| **3. DMA 맵핑**         | `dma_map_sg()` / `dma_map_single()`                     | **드라이버**      | 가상 주소를 DMA용 **물리/버스 주소(dma_addr_t)**로 변환하고, **CPU 캐시 플러시(Flush)**를 수행해 데이터 일관성을 맞춥니다.         |
+| **4. 채널 할당**        | `dma_request_chan()`                                    | **드라이버**      | 사용할 DMA Engine의 채널(Channel) 자원을 요청하여 할당받습니다.                                                                    |
+| **5. 기술자 생성**      | `dmaengine_prep_slave_sg()`                             | **드라이버**      | 전송 주소, 크기, 방향 정보가 담긴 **DMA 기술자(Descriptor)**를 생성합니다.                                                         |
+| **6. 콜백 등록**        | `desc->callback = dma_complete_cb;`                     | **드라이버**      | DMA 전송이 끝났을 때 인터럽트 핸들러가 호출할 후처리 콜백 함수를 등록합니다.                                                       |
+| **7. 전송 시작**        | `dmaengine_submit()`<br><br>`dma_async_issue_pending()` | **드라이버**      | 작성된 기술자를 DMA 큐에 넣고, DMA 하드웨어의 Start 비트를 세팅하여 **실제 HW 전송을 시작**합니다.                                 |
+| **8. HW 전송**          | *(하드웨어 자체 실행)*                                  | **DMA Engine**    | CPU 개입 없이 **RAM $\leftrightarrow$ Device** 간 데이터를 직접 고속 전송합니다.                                                   |
+| **9. 인터럽트 처리**    | `request_irq()`로 등록된 **ISR**                        | **커널/드라이버** | HW 전송 완료 후 발생한 IRQ를 수신하고, 6단계에서 등록한 콜백 함수(`dma_complete_cb`)를 실행합니다.                                 |
+| **10. 맵핑 해제**       | `dma_unmap_sg()` / `dma_unmap_single()`                 | **드라이버**      | DMA 주소 변환 맵핑을 해제하고, 수신된 데이터의 경우 CPU 캐시를 **무효화(Invalidate)**하여 RAM의 최신 데이터를 읽을 수 있게 합니다. |
+| **11. 완료 알림**       | `wake_up_interruptible()`                               | **드라이버**      | 대기 상태(Sleep)에 있던 유저 프로세스를 깨워 완료 상태 및 읽은 바이트 수를 반환합니다.                                             |
+
+---
+
 #### DMA 전송 유형 (Consistent vs Streaming)
 - `DMA_MEMCPY`     : mem to mem copy
 - `DMA_MEMSET`     : 메모리 채우기
@@ -2226,7 +2283,7 @@ $$\text{CAS}(\text{address}, \text{expected\_val}, \text{new\_val})$$
 
 ## `devm_*` Managed Resource API 
 
-TODO: here
+TODO: devm_* API
 device managed 접두사가 붙은 API는 할당한 자원들을 `struct device`에 연결하고 드라이버 제거 (`exit`) 또는 `probe()` 실패 시 *커널이 자원을 자동으로 역순으로 해제*해 준다.
 
 | default API                      | devm_* API                | desc                        |

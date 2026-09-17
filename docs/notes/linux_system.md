@@ -25,7 +25,7 @@
   - [프로세스 \& 스레드 프로그래밍 (Process \& Thread Management)](#프로세스--스레드-프로그래밍-process--thread-management)
     - [Linux Thread 모델 (LWP) \& POSIX Threads (`pthread`)](#linux-thread-모델-lwp--posix-threads-pthread)
       - [POSIX Thread API (`<pthread.h>`) 및 스레드 상태](#posix-thread-api-pthreadh-및-스레드-상태)
-    - [Daemon Processes \& systemd](#daemon-processes--systemd)
+    - [Daemon Processes \& Init Systems (systemd, sysvinit)](#daemon-processes--init-systems-systemd-sysvinit)
       - [데몬 프로세스 (Daemon Process)](#데몬-프로세스-daemon-process)
       - [systemd 서비스 및 모듈 자동 로드](#systemd-서비스-및-모듈-자동-로드)
       - [sysvinit](#sysvinit)
@@ -43,7 +43,7 @@
       - [`struct sigaction` 및 신호 처리 API](#struct-sigaction-및-신호-처리-api)
     - [Session \& Process Group](#session--process-group)
   - [I/O 다중화 (Multiplexed I/O)](#io-다중화-multiplexed-io)
-    - [API 비교](#api-비교)
+    - [유저 레벨 API 비교 (select, poll, epoll)](#유저-레벨-api-비교-select-poll-epoll)
   - [애플리케이션 디버깅 \& 크래시 분석 (Application Debugging \& Crash Analysis)](#애플리케이션-디버깅--크래시-분석-application-debugging--crash-analysis)
     - [GDB \& Core Dump Analysis](#gdb--core-dump-analysis)
       - [Core Dump](#core-dump)
@@ -94,7 +94,9 @@
       - [`container_of()` 매크로](#container_of-매크로)
     - [`ioctl` Interface](#ioctl-interface)
     - [Kernel Timer](#kernel-timer)
-    - [I/O Multiplexing](#io-multiplexing)
+      - [1. 커널 시간 관리 체계 (`HZ`, `jiffies`)](#1-커널-시간-관리-체계-hz-jiffies)
+      - [2. `timer_list` API (커널 4.14+ 기준)](#2-timer_list-api-커널-414-기준)
+      - [3. 타이머 콜백 Context 및 작업 제약 사항](#3-타이머-콜백-context-및-작업-제약-사항)
     - [GPIO Subsystem \& Hardware Control](#gpio-subsystem--hardware-control)
     - [Device Tree \& Platform Driver](#device-tree--platform-driver)
       - [Device Tree 구조 및 노드 파싱 (DTS/DTB)](#device-tree-구조-및-노드-파싱-dtsdtb)
@@ -109,18 +111,29 @@
         - [5. `interrupts` 속성과 인터럽트 컨트롤러 (Interrupt Architecture)](#5-interrupts-속성과-인터럽트-컨트롤러-interrupt-architecture)
         - [6. `ranges`와 버스 브리지 (Address Translation)](#6-ranges와-버스-브리지-address-translation)
         - [7. 핵심 표준 노드 (Standard Well-Known Nodes)](#7-핵심-표준-노드-standard-well-known-nodes)
+        - [8. 정적 디바이스 트리 오버라이딩 (system-user.dtsi)](#8-정적-디바이스-트리-오버라이딩-system-userdtsi)
+          - [1) DTSI 오버라이딩(Overriding) 동작 원리](#1-dtsi-오버라이딩overriding-동작-원리)
+          - [2) 오버라이딩 핵심 문법 및 디렉티브](#2-오버라이딩-핵심-문법-및-디렉티브)
+          - [3) 실전 `system-user.dtsi` 커스터마이징 예제](#3-실전-system-userdtsi-커스터마이징-예제)
       - [Platform Device \& Platform Driver 매칭 메커니즘](#platform-device--platform-driver-매칭-메커니즘)
         - [1. 전체 바인딩 시퀀스 (Binding Sequence Lifecycle)](#1-전체-바인딩-시퀀스-binding-sequence-lifecycle)
         - [2. `of_match_table`과 `MODULE_DEVICE_TABLE`](#2-of_match_table과-module_device_table)
         - [3. `struct platform_driver` 구조체와 핵심 멤버](#3-struct-platform_driver-구조체와-핵심-멤버)
-        - [4. 커널 핵심 파싱 API 및 실전 드라이버 코드](#4-커널-핵심-파싱-api-및-실전-드라이버-코드)
+        - [4. of\_\* (Open Firmware) 디바이스 트리 파싱 핵심 API](#4-of_-open-firmware-디바이스-트리-파싱-핵심-api)
+          - [1) 노드 탐색 및 참조 API](#1-노드-탐색-및-참조-api)
+          - [2) 프로퍼티 읽기 API (`of_property_read_*`)](#2-프로퍼티-읽기-api-of_property_read_)
+          - [3) I/O 메모리 및 인터럽트 변환 매핑 API](#3-io-메모리-및-인터럽트-변환-매핑-api)
+          - [4) 서브시스템 헬퍼 API](#4-서브시스템-헬퍼-api)
+        - [5. 실전 플랫폼 드라이버 구현 종합 예제](#5-실전-플랫폼-드라이버-구현-종합-예제)
+        - [6. 자원 관리 자동화 (devm\_\* Managed Resource API)](#6-자원-관리-자동화-devm_-managed-resource-api)
+          - [1) 도입 배경 및 해결 과제](#1-도입-배경-및-해결-과제)
+          - [2) 내부 동작 원리](#2-내부-동작-원리)
+          - [3) 주요 API 매핑 및 비교](#3-주요-api-매핑-및-비교)
       - [Device Tree Overlay (DTO)](#device-tree-overlay-dto)
         - [1. DTO의 개념과 필요성](#1-dto의-개념과-필요성)
         - [2. 핵심 원리 및 커널 링킹 메커니즘](#2-핵심-원리-및-커널-링킹-메커니즘)
         - [3. DTSO 문법 (Modern Syntax)](#3-dtso-문법-modern-syntax)
         - [4. 런타임 DTO 적용 및 해제 (ConfigFS)](#4-런타임-dto-적용-및-해제-configfs)
-      - [of\_\* API](#of_-api)
-      - [system-user.dtsi를 이용한 커스터마이징](#system-userdtsi를-이용한-커스터마이징)
   - [커널 인터럽트 \& 블로킹 I/O (Interrupt \& Blocking I/O)](#커널-인터럽트--블로킹-io-interrupt--blocking-io)
     - [커널 인터럽트 처리 체계와 Top/Bottom Half 개념](#커널-인터럽트-처리-체계와-topbottom-half-개념)
     - [대기 큐(Wait Queue)와 블로킹 I/O (Blocking I/O)](#대기-큐wait-queue와-블로킹-io-blocking-io)
@@ -144,6 +157,10 @@
       - [커널 뮤텍스 (Kernel Mutex)](#커널-뮤텍스-kernel-mutex)
       - [Spinlock](#spinlock)
     - [Completion (경쟁 상태 완화를 위한 동기화)](#completion-경쟁-상태-완화를-위한-동기화)
+    - [I/O 다중화 (Multiplexed I/O) 지원 (.poll 핸들러 구현)](#io-다중화-multiplexed-io-지원-poll-핸들러-구현)
+      - [1. 드라이버의 `.poll` 콜백 역할 및 시그니처](#1-드라이버의-poll-콜백-역할-및-시그니처)
+      - [2. 주요 반환 비트마스크 플래그](#2-주요-반환-비트마스크-플래그)
+      - [3. 드라이버 `.poll` 구현 전형적 패턴](#3-드라이버-poll-구현-전형적-패턴)
     - [커널 스레드 (kernel thread, kthread)](#커널-스레드-kernel-thread-kthread)
       - [커널 스레드의 특징 및 핵심 API](#커널-스레드의-특징-및-핵심-api)
       - [kthread Priority Set (Nice값, RT 우선순위 설정)](#kthread-priority-set-nice값-rt-우선순위-설정)
@@ -157,6 +174,7 @@
       - [드라이버에서의 `nopage`/`fault` 핸들러 구현](#드라이버에서의-nopagefault-핸들러-구현)
     - [DMA Engine \& Asynchronous Memory Transfer](#dma-engine--asynchronous-memory-transfer)
       - [DMA Engine subsystem API](#dma-engine-subsystem-api)
+        - [DMA 비동기 전송 11단계 전체 시퀀스](#dma-비동기-전송-11단계-전체-시퀀스)
       - [DMA 전송 유형 (Consistent vs Streaming)](#dma-전송-유형-consistent-vs-streaming)
       - [DMA 메모리 할당 및 캐시 일관성 (Cache Coherency)](#dma-메모리-할당-및-캐시-일관성-cache-coherency)
 - [3. 컴퓨터 과학 배경지식 (Computer Science Basic)](#3-컴퓨터-과학-배경지식-computer-science-basic)
@@ -187,8 +205,6 @@
     - [인터럽트 분할 처리 (Top-Half \& Bottom-Half) 원리](#인터럽트-분할-처리-top-half--bottom-half-원리)
     - [I/O 모델 비교](#io-모델-비교)
   - [운영체제 커널 구조 이론 (OS Kernel Architecture Theory)](#운영체제-커널-구조-이론-os-kernel-architecture-theory)
-- [memo](#memo)
-  - [`devm_*` Managed Resource API](#devm_-managed-resource-api)
 ---
 
 # 1. Linux basic & Application Programming
@@ -399,7 +415,7 @@ int pthread_detach(pthread_t thread);
 
 ---
 
-### Daemon Processes & systemd
+### Daemon Processes & Init Systems (systemd, sysvinit)
 
 #### 데몬 프로세스 (Daemon Process)
 터미널 입력과 분리되어 백그라운드에서 특정 시스템 서비스를 수행하는 프로세스
@@ -412,12 +428,24 @@ int pthread_detach(pthread_t thread);
 - 커널 모듈 자동 로드: 부팅 시 모듈을 자동으로 `insmod/modprobe` 하도록 `/etc/modules-load.d/*.conf` 디렉터리에 로드할 모듈 이름을 기술합니다
 
 #### sysvinit
-TODO: sysvinit
-
-init으로 알려진 기본 시스템 초기화 프로세스.
-
-/etc/init.d 또는 /etc/rc.local의 쉘 스크립트를 통해서 처리한다.
-/etc/rc*.d 폴더 내부에 있는 "[S|K][0-9][0-9]이름" 형태의 파일을 우선순위대로 실행한다.
+전통적인 유닉스(Unix System V) 계열에서 유래한 커널 부팅 후 최초로 실행되는 사용자 공간 초기화 프로세스(PID 1)
+- **런레벨(Runlevel)**: 시스템의 동작 상태를 0~6 단계로 구분하여 관리
+  - `0`: 시스템 종료 (Halt)
+  - `1`: 단일 사용자 모드 (Single-user / Rescue, 유지보수용)
+  - `2 ~ 5`: 다중 사용자 모드 (Multi-user, 런레벨 5는 보통 GUI 환경)
+  - `6`: 시스템 재부팅 (Reboot)
+- **초기화 및 스크립트 실행 체계**:
+  - `/etc/inittab`: 기본 런레벨 설정 및 부팅 초기화 스크립트(`/etc/init.d/rc`) 진입점 정의
+  - `/etc/init.d/`: 각 서비스의 시작(`start`), 중지(`stop`), 재시작(`restart`) 동작을 정의한 쉘 스크립트 보관
+  - `/etc/rc<runlevel>.d/`: 해당 런레벨 진입 시 실행할 심볼릭 링크 디렉터리 (예: `/etc/rc3.d/`)
+- **스크립트 명명 규칙 및 실행 순서**: `[S|K][우선순위번호][서비스명]`
+  - `K` (Kill): 이전 런레벨에서 실행 중이던 서비스를 중지 (먼저 실행)
+  - `S` (Start): 현재 런레벨에서 활성화할 서비스를 시작
+  - `00 ~ 99`: 실행 우선순위 숫자 (번호가 낮을수록 먼저 실행되며 의존성 순서대로 번호 할당)
+  - 예: `S10network` (네트워크 인터페이스 우선 초기화) $\rightarrow$ `S50sshd` (네트워크 기반 SSH 데몬 구동)
+- **systemd와의 차이점 및 한계**:
+  - 순차적 쉘 스크립트 포크(Fork) 방식으로 부팅 속도가 상대적으로 느림 (systemd는 소켓 기반 병렬 실행)
+  - 프로세스 추적 한계: 데몬이 이중 `fork()` 시 PID 추적이 유실될 수 있음 (systemd는 cgroups 단위로 완벽 추적)
 
 
 ---
@@ -535,7 +563,7 @@ fds[0].events = POLLIN; // events는 이벤트의 종류를 나타내는 플래�
 poll(fds, n, ms_timeout); // n개 동시 발생하면 참
 ```
 
-### API 비교
+### 유저 레벨 API 비교 (select, poll, epoll)
 - `select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)`
   - BSD Unix에서 시작된 오래된 I/O 다중화
   - `fd_set`은 비트맵 구조로 비트 하나가 fd 하나
@@ -997,21 +1025,61 @@ static long my_driver_ioctl(struct file *file, unsigned int cmd, unsigned long a
 ---
 
 ### Kernel Timer
+커널 내에서 특정 시간 이후에 작업을 지연 실행(Deferred Execution)하기 위한 비동기 타이머 메커니즘 (`<linux/timer.h>`)
 
-TODO: kernel timer
-- Kernel의 시간 관리 체계 `jiffies`, `HZ`
-- `timer_list` API
-- 타이머 콜백의 Handler Context(softirq) 허용 작업과 금지 작업
-- Self-reloading timer
+#### 1. 커널 시간 관리 체계 (`HZ`, `jiffies`)
+- **`HZ` (Tick Rate)**: 시스템 타이머 하드웨어가 1초당 발생시키는 클록 인터럽트(Tick) 횟수
+  - 아키텍처 및 커널 설정에 따라 결정 (예: ARM은 보통 100, x86은 250 또는 1000)
+  - 1 Tick 주기 = $1 / HZ$ 초 (예: $HZ = 1000$이면 1 Tick은 1ms)
+- **`jiffies`**: 시스템 부팅 이후 발생한 타이머 인터럽트(Tick)의 누적 횟수를 저장하는 커널 전역 변수 (`unsigned long volatile jiffies`)
+- **시간 변환 헬퍼 함수**:
+  - `msecs_to_jiffies(ms)`: 밀리초 단위를 jiffies tick 수로 변환
+  - `usecs_to_jiffies(us)`: 마이크로초 단위를 jiffies tick 수로 변환
+  - `jiffies_to_msecs(j)`: jiffies tick을 밀리초로 변환
+- **오버플로우 안전 비교 매크로**: `jiffies`는 32-bit 시스템에서 약 49.7일 후 0으로 오버플로우되므로 단순 비교 연산자(`<`, `>`) 대신 전용 비교 매크로를 사용해야 합니다.
+  - `time_after(unknown, known)`: `unknown` 시점이 `known` 시점 이후인지 확인
+  - `time_before(unknown, known)`: `unknown` 시점이 `known` 시점 이전인지 확인
+  - `time_after_eq()`, `time_before_eq()`: 이상/이하 비교
 
-### I/O Multiplexing
+#### 2. `timer_list` API (커널 4.14+ 기준)
+```c
+#include <linux/timer.h>
 
-TODO: I/O Multiplexing
-- poll
-- select
-- epoll
+struct timer_list my_timer;
 
+// 타이머 만료 콜백 함수 (인터럽트 컨텍스트에서 실행)
+void my_timer_callback(struct timer_list *t)
+{
+    pr_info("Kernel timer expired!\n");
 
+    // Self-reloading Timer (주기적 타이머) 동작 구현 시:
+    // mod_timer(t, jiffies + msecs_to_jiffies(1000));
+}
+
+// 1. 타이머 초기화 (초기화 매크로/함수)
+timer_setup(&my_timer, my_timer_callback, 0);
+
+// 2. 만료 시간 설정 및 타이머 등록/갱신
+mod_timer(&my_timer, jiffies + msecs_to_jiffies(500)); // 500ms 후 만료
+
+// 3. 타이머 제거
+del_timer(&my_timer);         // 비동기 타이머 취소
+del_timer_sync(&my_timer);    // 멀티코어 환경에서 실행 중인 핸들러 완료까지 대기 (모듈 언로드 시 필수)
+```
+
+#### 3. 타이머 콜백 Context 및 작업 제약 사항
+커널 타이머 만료 시 등록된 콜백 함수는 하드웨어 인터럽트 직후 실행되는 **Softirq 컨텍스트(`TIMER_SOFTIRQ`)**에서 호출됩니다.
+- **금지 작업 (절대 금지 - Sleep 불가)**:
+  - 프로세스를 블록/슬립시키는 함수 호출 금지 (`msleep()`, `ssleep()`, `schedule()`, `wait_event()`)
+  - 슬립 가능한 락 획득 금지 (`mutex_lock()`, `down()`)
+  - 유저 공간 메모리 직접 접근 금지 (`copy_to_user()`, `copy_from_user()`)
+  - `GFP_KERNEL` 플래그를 사용한 메모리 할당 금지 (`GFP_ATOMIC`만 허용)
+- **허용 작업**:
+  - 스핀락 사용 (`spin_lock()`, `spin_lock_irqsave()`)
+  - 지연 작업 위임 (Workqueue 큐잉 `schedule_work()`)
+  - 메모리 맵 I/O 레지스터 직접 제어 (`readl()`, `writel()`)
+
+---
 
 ### GPIO Subsystem & Hardware Control
 하드웨어 Pin 레지스터 주소와 Bit Mask를 디바이스 드라이버가 직접 제어하지 않고, 커널이 제공하는 추상화 계층을 통해 GPIO 제어를 수행하는 서브시스템
@@ -1069,8 +1137,36 @@ flowchart TD
 | **OF API** | **Open Firmware API**                             | PowerPC Open Firmware 규격에서 유래한 리눅스 커널 내부의 디바이스 트리 파싱 및 노드 탐색 함수군 (`of_property_read_*`, `of_find_node_*` 등).  |
 
 ###### DTC 컴파일
+`dtc`는 DTS 텍스트 소스를 파싱하여 커널이 부팅 시 읽을 수 있는 바이너리 블롭(DTB)으로 빌드하거나, 반대로 DTB 바이너리를 역컴파일하여 DTS 소스로 복원하는 전용 유틸리티 도구입니다.
 
-TODO: DTC
+- **기본 명령어 문법**:
+  ```bash
+  dtc [옵션] -I <입력형식> -O <출력형식> -o <출력파일명> <입력파일명>
+  ```
+- **주요 활용 명령어**:
+  - **DTS $\rightarrow$ DTB 컴파일**:
+    ```bash
+    dtc -I dts -O dtb -o my_board.dtb my_board.dts
+    ```
+  - **DTB $\rightarrow$ DTS 역컴파일 (Decompile / 디버깅)**:
+    ```bash
+    # 타겟 보드에서 추출한 live dtb나 바이너리 트리의 실제 노드 결합 상태를 확인할 때 유용
+    dtc -I dtb -O dts -o decompiled.dts my_board.dtb
+    ```
+  - **Device Tree Overlay 심볼 생성 (`-@`)**:
+    ```bash
+    # 런타임 DTO 링킹에 필요한 노드 레이블 정보를 '__symbols__' 노드로 DTB에 유지
+    dtc -@ -I dts -O dtb -o my_board.dtb my_board.dts
+    ```
+- **C 전처리기(CPP) 연동**:
+  - 현대 DTS 소스는 `#include` 헤더 참조 및 `#define` 상수 정의(GPIO/인터럽트 플래그 등)를 적극 사용하므로, `dtc` 실행 전에 반드시 C 전처리기(`cpp`)를 거쳐야 합니다:
+    ```bash
+    # 전처리기와 dtc를 파이프라인으로 연결하여 빌드
+    cpp -nostdinc -I include -undef -x assembler-with-cpp my_board.dts | dtc -I dts -O dtb -o my_board.dtb -
+    ```
+- **커널 빌드 시스템(Kbuild) 내 DTC 연동**:
+  - 커널 루트 디렉터리에서 `make dtbs` 실행 시 설정된 아키텍처(`arch/$ARCH/boot/dts/`)의 디바이스 트리가 자동으로 전처리 및 컴파일됩니다.
+  - `make dtbs_check`: YAML 바인딩 스키마(`Documentation/devicetree/bindings/`)와의 문법 일치 여부를 검증합니다.
 
 
 ##### 3. 기본 DTS 문법 및 노드 구조
@@ -1215,6 +1311,77 @@ axi_to_local_bridge {
 - `/chosen`: 커널 커맨드라인(`bootargs`), 콘솔 경로(`stdout-path`), 램디스크 주소
 - `/aliases`: 드라이버 인덱스 부여용 별칭 테이블 (`serial0 = &uart0;`)
 
+##### 8. 정적 디바이스 트리 오버라이딩 (system-user.dtsi)
+Xilinx PetaLinux, Yocto 등 임베디드 빌드 시스템에서 자동 생성되는 베이스 하드웨어 디바이스 트리(`zynq-7000.dtsi`, `pcw.dtsi` 등)를 직접 수정하지 않고, 사용자 정의 하드웨어 설정(IP 코어 활성화, 핀 설정, 버퍼 크기 변경 등)을 오버라이드하기 위한 최상위 사용자 dtsi 파일입니다.
+
+###### 1) DTSI 오버라이딩(Overriding) 동작 원리
+- **노드 병합 (Node Merge)**: DTC(Device Tree Compiler)는 파싱 과정에서 동일한 경로의 노드가 여러 번 선언되면 이를 하나의 노드로 병합합니다.
+- **프로퍼티 덮어쓰기 (Property Overwrite)**: 동일한 노드 내에서 같은 이름의 프로퍼티가 재정의되면 **나중에 파싱된 값**이 이전 값을 덮어씁니다.
+- **새 프로퍼티 추가 (Property Addition)**: 기존 노드에 없던 새로운 프로퍼티는 해당 노드의 자식 속성으로 추가됩니다.
+
+###### 2) 오버라이딩 핵심 문법 및 디렉티브
+1. **레이블 참조를 통한 오버라이드 (`&label`) [권장]**:
+   - SoC 베이스 dtsi에서 선언된 노드 레이블을 참조하여 필요한 속성만 재정의하거나 활성화합니다.
+   ```dts
+   // UART1 컨트롤러 활성화 및 통신 속도 재정의
+   &uart1 {
+       status = "okay";
+       current-speed = <115200>;
+   };
+   ```
+2. **절대 경로(Path)를 통한 오버라이드**:
+   - 레이블이 없는 노드는 루트(`/`)부터 시작하는 전체 계층 경로로 접근하여 수정합니다.
+   ```dts
+   / {
+       amba {
+           ethernet@e000b000 {
+               phy-mode = "rgmii-id";
+           };
+       };
+   };
+   ```
+3. **속성 명시적 삭제 (`/delete-property/`)**:
+   - 상위 dtsi에서 정의된 특정 프로퍼티를 완전히 제거할 때 사용합니다.
+   ```dts
+   &gem0 {
+       /delete-property/ phy-handle; // 기존 지정된 phy-handle 속성 제거
+   };
+   ```
+4. **노드 명시적 삭제 (`/delete-node/`)**:
+   - 상위 dtsi에서 선언된 특정 서브 노드 전체를 제거할 때 사용합니다.
+   ```dts
+   / {
+       /delete-node/ memory@0; // 기존 메모리 노드 제거 후 새로 선언할 때
+   };
+   ```
+
+###### 3) 실전 `system-user.dtsi` 커스터마이징 예제
+```dts
+/include/ "system-conf.dtsi"
+/ {
+    chosen {
+        bootargs = "console=ttyPS0,115200 root=/dev/mmcblk0p2 rw earlyprintk rootwait";
+        stdout-path = "serial0:115200n8";
+    };
+
+    // 사용자 커스텀 GPIO LED 노드 추가
+    gpio-leds {
+        compatible = "gpio-leds";
+        led1 {
+            label = "sys-led";
+            gpios = <&gpio0 7 0>; // MIO Pin 7
+            default-state = "on";
+        };
+    };
+};
+
+// PL(Programmable Logic) 영역의 커스텀 AXI IP 활성화
+&my_custom_axi_ip_0 {
+    compatible = "vendor,my-axi-ip-1.0";
+    status = "okay";
+};
+```
+
 ---
 
 #### Platform Device & Platform Driver 매칭 메커니즘
@@ -1283,7 +1450,55 @@ struct platform_driver {
 - **`.remove`**: 모듈 언로드 시 자원 해제.
 - **`module_platform_driver(my_driver)`**: init/exit 등록 편의 매크로.
 
-##### 4. 커널 핵심 파싱 API 및 실전 드라이버 코드
+##### 4. of_* (Open Firmware) 디바이스 트리 파싱 핵심 API
+임베디드 리눅스 커널의 디바이스 트리 파싱 API 및 구조체는 IEEE 1275 표준인 **Open Firmware** 규격에서 유래하여 `of_` 접두사를 사용합니다 (`<linux/of.h>`, `<linux/of_address.h>`, `<linux/of_irq.h>`).
+드라이버의 `probe()` 함수 등에서 디바이스 노드(`struct device_node`)로부터 하드웨어 속성을 추출할 때 사용하는 핵심 함수군입니다.
+
+###### 1) 노드 탐색 및 참조 API
+- `struct device_node *of_find_node_by_name(struct device_node *from, const char *name);`
+  - 노드 이름으로 디바이스 노드 검색
+- `struct device_node *of_find_compatible_node(struct device_node *from, const char *type, const char *compat);`
+  - `compatible` 속성 문자열로 일치하는 노드 검색
+- `struct device_node *of_get_child_by_name(const struct device_node *node, const char *name);`
+  - 특정 노드의 직계 자식 노드 검색
+- `void of_node_put(struct device_node *node);`
+  - 노드 탐색 함수 호출로 증가한 노드의 참조 카운트(Refcount)를 감소시켜 자원 정리 (노드 사용 완료 후 필수 호출)
+
+###### 2) 프로퍼티 읽기 API (`of_property_read_*`)
+- **단일 32비트 정수 읽기**:
+  ```c
+  int of_property_read_u32(const struct device_node *np, const char *propname, u32 *out_value);
+  ```
+- **정수 배열 읽기**:
+  ```c
+  int of_property_read_u32_array(const struct device_node *np, const char *propname, u32 *out_values, size_t sz);
+  ```
+- **문자열 읽기**:
+  ```c
+  int of_property_read_string(const struct device_node *np, const char *propname, const char **out_string);
+  ```
+- **Boolean 플래그 존재 여부 확인**:
+  ```c
+  bool of_property_read_bool(const struct device_node *np, const char *propname);
+  ```
+
+###### 3) I/O 메모리 및 인터럽트 변환 매핑 API
+- **I/O 메모리 변환 및 매핑 (`of_iomap`)**:
+  ```c
+  void __iomem *of_iomap(struct device_node *node, int index);
+  ```
+  - 디바이스 트리의 `reg` 속성을 파싱하여 물리 주소를 가상 주소로 한 번에 `ioremap` 수행
+- **인터럽트 번호 매핑 (`irq_of_parse_and_map`)**:
+  ```c
+  int irq_of_parse_and_map(struct device_node *node, int index);
+  ```
+  - 디바이스 트리의 `interrupts` 속성을 파싱하여 커널의 리눅스 가상 IRQ 번호로 변환 매핑
+
+###### 4) 서브시스템 헬퍼 API
+- **GPIO**: `of_get_named_gpio(np, "gpios", 0);`
+- **클럭**: `of_clk_get_by_name(np, "my_clk");`
+
+##### 5. 실전 플랫폼 드라이버 구현 종합 예제
 ```c
 #include <linux/module.h>
 #include <linux/platform_device.h>
@@ -1364,6 +1579,36 @@ module_platform_driver(custom_dev_driver);
 MODULE_LICENSE("GPL");
 ```
 
+##### 6. 자원 관리 자동화 (devm_* Managed Resource API)
+디바이스 드라이버가 할당받은 다양한 시스템 자원(I/O 메모리, IRQ, 클럭, GPIO 등)의 수명을 `struct device`의 생명주기에 바인딩하여 자동으로 관리해 주는 커널의 **Device-Managed Resource (Devres)** 프레임워크입니다.
+
+###### 1) 도입 배경 및 해결 과제
+- **전통적인 `probe()` 에러 처리의 한계**:
+  - 드라이버 초기화 단계에서 메모리, 레지스터 매핑, 인터럽트 등 여러 자원을 순차적으로 할당할 때, 중간 단계에서 실패하면 이전에 성공한 자원들을 역순으로 일일이 해제해야 했습니다.
+  - 이로 인해 수많은 `goto err_free_*;` 레이블이 필요했고, 누락 시 심각한 커널 자원 누수(Resource Leak)가 발생했습니다.
+- **Devres의 해결책 (Kernel RAII)**:
+  - `devm_` 접두사가 붙은 API를 사용하면 할당된 자원이 디바이스(`struct device`)에 자동 등록됩니다.
+  - 드라이버 `probe()` 실패 시 커널이 이미 할당된 자원을 **역순(LIFO)**으로 자동 해제합니다.
+  - 드라이버 언로드(`remove()` 또는 `unbind`) 시에도 등록된 모든 자원이 자동으로 완벽히 회수되므로 `remove()` 코드의 복잡성이 대폭 줄어듭니다.
+
+###### 2) 내부 동작 원리
+1. `devm_*` 함수 호출 시 내부적으로 `devres_alloc()`을 통해 자원 정보와 전용 해제 콜백 함수(`release` 함수 포인터)를 담은 노드를 생성합니다.
+2. 할당 성공 시 해당 노드를 디바이스 구조체(`struct device`)의 연결 리스트(`devres_head`)에 삽입합니다.
+3. 드라이버 바인딩 실패(`probe` 실패 반환) 또는 드라이버 분리(`remove`) 시 `devres_release_all()`이 호출되어, 등록된 자원들을 LIFO(Last-In First-Out) 역순으로 해제 콜백을 실행하여 반환합니다.
+
+###### 3) 주요 API 매핑 및 비교
+| 일반 커널 API                      | Devres (`devm_*`) API                      | 설명 및 특이사항                                                               |
+| :--------------------------------- | :----------------------------------------- | :----------------------------------------------------------------------------- |
+| `ioremap()`                        | `devm_ioremap()`                           | I/O 물리 주소를 커널 가상 주소로 매핑                                          |
+| `ioremap() + request_mem_region()` | `devm_ioremap_resource()`                  | 메모리 영역 점유 검증 + `request_mem_region` + `ioremap` 일괄 수행 (가장 권장) |
+| `request_irq()`                    | `devm_request_irq()`                       | 인터럽트 핸들러 등록 (드라이버 제거 시 자동 `free_irq`)                        |
+| `kmalloc()`                        | `devm_kmalloc()`                           | 커널 메모리 할당                                                               |
+| `kzalloc()`                        | `devm_kzalloc()`                           | 0으로 초기화된 커널 메모리 할당 (드라이버 private data 할당 시 빈번히 사용)    |
+| `kcalloc()`                        | `devm_kcalloc()`                           | 배열 형태 커널 메모리 할당                                                     |
+| `clk_get()`                        | `devm_clk_get()`                           | SoC 클럭(Clock) 컨트롤러 리소스 획득                                           |
+| `gpiod_get()` / `gpio_request()`   | `devm_gpiod_get()` / `devm_gpio_request()` | GPIO 디스크립터 / 핀 리소스 획득                                               |
+| `dma_alloc_coherent()`             | `devm_dma_alloc_coherent()`                | 캐시 일관성 DMA 메모리 할당                                                    |
+
 ---
 
 #### Device Tree Overlay (DTO)
@@ -1436,20 +1681,6 @@ cat my_overlay.dtbo > /sys/kernel/config/device-tree/overlays/my_ip_overlay/dtbo
 # 3. 런타임 해제 (Hot-Unplug)
 rmdir /sys/kernel/config/device-tree/overlays/my_ip_overlay
 ```
-
-#### of_* API
-
-임베디드 리눅스 시스템에서 디바이스 트리(Device Tree) 프로토콜이 원래 IEEE 1275 표준인 'Open Firmware' 사양에서 유래되었기 때문에, 디바이스 트리를 다루는 모든 커널 API와 구조체에는 of_라는 접두사가 붙게 되었다.
-
-#### system-user.dtsi를 이용한 커스터마이징
-
-TODO: dtsi overriding
-
-DTC는 같은 노드가 여러 번 선언되면 나중에 선언된 속성이 이전 값을 덮어쓴다.
-
-- `/delete-property/`: 기존 속성 제거.
-- `/delete-node/`: 기존 노드 제거.
-
 
 ---
 
@@ -1829,6 +2060,56 @@ CPU 자원을 낭비하지만 ISR, Tasklet, Softirq context의 유일한 공유 
 
 ---
 
+### I/O 다중화 (Multiplexed I/O) 지원 (.poll 핸들러 구현)
+유저 공간의 `select()`, `poll()`, `epoll_wait()` 시스템 콜이 파일 디스크립터의 준비 상태를 질의할 때, 커널 VFS 계층은 해당 드라이버의 `struct file_operations`에 등록된 `.poll` 콜백 함수를 호출하여 장치의 I/O 가능 여부를 확인합니다.
+
+#### 1. 드라이버의 `.poll` 콜백 역할 및 시그니처
+```c
+#include <linux/poll.h>
+
+__poll_t (*poll) (struct file *filp, struct poll_table_struct *wait);
+```
+- **역할 1 (`poll_wait`)**: 드라이버의 대기 큐(`wait_queue_head_t`)를 커널의 `poll_table`에 등록합니다. (프로세스를 즉시 재우는 것이 아니라, 이벤트 발생 시 깨워줄 감시 목록에 바인딩)
+- **역할 2 (상태 반환)**: 현재 읽기/쓰기가 블로킹 없이 즉시 가능한 상태인지 판별하여 비트마스크(`__poll_t`)를 반환합니다. 데이터가 준비되지 않았으면 `0`을 반환합니다.
+
+#### 2. 주요 반환 비트마스크 플래그
+- `EPOLLIN` (`POLLIN`): 블로킹 없이 읽을 수 있는 데이터가 존재
+- `EPOLLRDNORM` (`POLLRDNORM`): 일반 데이터를 읽기 가능
+- `EPOLLOUT` (`POLLOUT`): 디바이스 버퍼에 블로킹 없이 데이터를 쓸 수 있음
+- `EPOLLERR` (`POLLERR`): 디바이스 오류 상태 발생
+- `EPOLLHUP` (`POLLHUP`): 디바이스 연결 끊김 (Hangup)
+
+#### 3. 드라이버 `.poll` 구현 전형적 패턴
+```c
+static DECLARE_WAIT_QUEUE_HEAD(my_wait_queue);
+static bool data_ready = false;
+
+static __poll_t my_driver_poll(struct file *filp, struct poll_table_struct *wait)
+{
+    __poll_t mask = 0;
+
+    // 1. 커널 poll_table에 디바이스 대기 큐 등록
+    poll_wait(filp, &my_wait_queue, wait);
+
+    // 2. 현재 준비 상태를 검사하여 마스크 생성
+    if (data_ready) {
+        mask |= (EPOLLIN | EPOLLRDNORM); // 읽기 준비 완료 플래그 세팅
+    }
+
+    return mask; // 조건 미충족 시 0 반환 -> 커널이 유저 프로세스를 sleep 상태로 전환
+}
+
+// 하드웨어 인터럽트 또는 데이터 수신 시점:
+static irqreturn_t my_interrupt_handler(int irq, void *dev_id)
+{
+    data_ready = true;
+    // 대기 중인 select/poll/epoll 태스크들을 깨움
+    wake_up_interruptible(&my_wait_queue);
+    return IRQ_HANDLED;
+}
+```
+
+
 ### 커널 스레드 (kernel thread, kthread)
 커널 공간(Kernel Space)에서 백그라운드 작업을 독립적으로 수행하기 위해 커널에 의해 생성되고 관리되는 스레드.
 
@@ -2014,8 +2295,18 @@ struct vm_area_struct {
 - **필요한 사례**: 고속 데이터 스트리밍, 네트워크 패킷 처리, PS (Processing System) - PL (Programmable Logic) 간 대용량 데이터 교환
 
 #### DMA Engine subsystem API
+리눅스 커널의 **DMA Engine 서브시스템 (`<linux/dmaengine.h>`)**은 다양한 플랫폼의 SoC DMA 컨트롤러 하드웨어를 추상화하여 디바이스 드라이버에 단일화된 비동기 메모리 전송 인터페이스를 제공하는 프레임워크입니다.
+드라이버 개발자는 하드웨어 DMA 컨트롤러 레지스터를 직접 조작할 필요 없이, 채널(Channel)을 요청하고 기술자(Descriptor)를 발행하여 전송을 위임합니다.
 
-TODO: DMA engine
+- **핵심 프로그래밍 단계 및 API 요약**:
+  1. **채널 획득**: `struct dma_chan *chan = dma_request_chan(dev, "rx");` (Device Tree의 `dmas` 프로퍼티와 바인딩된 DMA 채널 획득)
+  2. **슬레이브 설정 (Slave Config)**: `dmaengine_slave_config(chan, &config)` (`struct dma_slave_config`를 통해 FIFO 버퍼 주소, 버스트 폭/길이 설정)
+  3. **전송 기술자(Descriptor) 생성**: `struct dma_async_tx_descriptor *desc = dmaengine_prep_slave_sg(chan, sgl, sg_len, direction, flags);`
+  4. **완료 콜백 등록**: `desc->callback = my_dma_callback; desc->callback_param = my_data;`
+  5. **전송 큐 제출 및 하드웨어 구동**: `dmaengine_submit(desc);`로 큐에 삽입 후 `dma_async_issue_pending(chan);` 호출로 실제 하드웨어 DMA 전송 시작
+  6. **전송 중단 및 자원 반환**: `dmaengine_terminate_sync(chan);` (전송 중단), `dma_release_channel(chan);` (채널 해제)
+
+##### DMA 비동기 전송 11단계 전체 시퀀스
 
 | 단계                    | 주요 API / 함수                                         | 주체              | 실제 동작                                                                                                                          |
 | ----------------------- | ------------------------------------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
@@ -2275,28 +2566,4 @@ $$\text{CAS}(\text{address}, \text{expected\_val}, \text{new\_val})$$
   - 커널은 최소한의 기능(IPC, 기본 가상 메모리, 스케줄링)만 담당하고, 드라이버와 파일 시스템은 유저 공간 서버 프로세스로 분리
   - **모듈성과 안정성이 매우 높음**
   - 잦은 유저-커널 컨텍스트 스위칭 및 IPC 오버헤드로 인한 성능 비용 발생
-
-
-
-
-# memo
-
-## `devm_*` Managed Resource API 
-
-TODO: devm_* API
-device managed 접두사가 붙은 API는 할당한 자원들을 `struct device`에 연결하고 드라이버 제거 (`exit`) 또는 `probe()` 실패 시 *커널이 자원을 자동으로 역순으로 해제*해 준다.
-
-| default API                      | devm_* API                | desc                        |
-| -------------------------------- | ------------------------- | --------------------------- |
-| ioremap()                        | devm_ioremap()            | 물리-가상 주소 매핑         |
-| ioremap() + request_mem_region() | devm_ioremap_resource()   | 메모리 영역 매핑            |
-| request_irq()                    | devm_request_irq()        | 인트럽트 핸들러 등록        |
-| kmalloc()                        | devm_kmalloc()            | 커널 메모리 할당            |
-| kzalloc()                        | devm_kzalloc()            | 커널 메모리 할당 (0 초기화) |
-| kcalloc()                        | devm_kcalloc()            | 커널 배열 메모리 할당       |
-| clk_get()                        | devm_clk_get()            | 클럭 리소스 획득            |
-| gpio_request()                   | devm_gpio_request()       | GPIO 핀 획득                |
-| dma_alloc_coherent()             | devm_dma_alloc_coherent() | DMA 일관성 메모리 할당      |
-
----
 

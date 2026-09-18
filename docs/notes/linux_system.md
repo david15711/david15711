@@ -2035,8 +2035,9 @@ MODULE_DESCRIPTION("GPIO Interrupt & Blocking I/O Character Device Driver");
   - `mutex_trylock(struct mutex *)`: Non-Blocking 구현, 이미 점유된 뮤텍스라면 기다리지 않고 0 반환
 
 #### Spinlock
+루프문 내에서 Lock이 풀렸는지 계속 확인하는 방식
 Non-blocking, busy-wait을 하는 동기화 메커니즘
-CPU 자원을 낭비하지만 ISR, Tasklet, Softirq context의 유일한 공유 자원 보호 기능
+멀티 코어 환경에서 Critical Section 작업이 매우 짧아 sleep에 들어가 넘겨주는 교환 비용조차 아까운 경우, CPU 자원을 낭비하지만 ISR, Tasklet, Softirq context의 유일한 공유 자원 보호 기능
 
 - `DEFINE_SPINLOCK(spinlock_t name);`
 - `spin_lock()`: ISR 내에서 사용

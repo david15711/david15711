@@ -152,7 +152,7 @@
 | :------------: | :-------------------------------------------------- | :--------------------------------------------- |
 |  **Language**  | C언어                                               | [📄 읽기](./docs/notes/C.md)                    |
 | **Language++** | C++                                                 | [📄 읽기](./docs/notes/C++.md)                  |
-|  **Language**  | C#                                                  | [📄 읽기](./docs/notes/C#.md)                   |
+|  **Language**  | C#                                                  | [📄 읽기](./docs/notes/C%23.md)                 |
 |  **Embedded**  | Embedded System Basic (STM32)                       | [📄 읽기](./docs/notes/embedded_basic.md)       |
 |    **RTOS**    | RTOS 기본 usage (FreeRTOS)                          | [📄 읽기](./docs/notes/RTOS.md)                 |
 |   **Linux**    | Linux Bash shell                                    | [📄 읽기](./docs/notes/linux_bash.md)           |

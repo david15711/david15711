@@ -159,6 +159,7 @@
 | :ls / :buffers           | 편집기의 파일들의 내용을 가진 버퍼 리스트를 연다, 파일이 닫혀도 남아있으므로 유용 |
 | :sb / :sbuffer           | split buffer, 버퍼 숫자를 기준으로 화면 스플릿                                    |
 | :vert / :hor             | :vertical / :horizon , 뒤에 오는 화면 분할/열기 명령어에 해당 속성을 강제한다     |
+| :bo[tright] / :to[pleft] | 뒤에 오는 화면 분할/열기 명령어에 해당 속성을 강제한다                            |
 | :difft[his]              | 현재 윈도우를 비교 윈도우로 만든다.                                               |
 
 #### tab page

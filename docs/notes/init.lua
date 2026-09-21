@@ -8,6 +8,18 @@ vim.opt.cursorcolumn = true
 vim.opt.termguicolors = true
 vim.syntax = true
 
+-- C 및 C++ 파일이 열릴 때 실행되는 Autocmd
+-- vim.api.nvim_create_autocmd("FileType", {
+--   pattern = { "c", "cpp" },
+--   callback = function()
+--     local paths = require("config/paths") -- SDK 경로 지정
+--     if paths then
+--       -- 현재 버퍼의 path 맨 앞에 SDK 경로들을 추가
+--       vim.opt_local.path:prepend(paths.sdk_includes)
+--     end
+--   end,
+-- })
+
 -- 1. Lazy.nvim 플러그인 매니저 부트스트랩
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not vim.loop.fs_stat(lazypath) then
@@ -32,7 +44,11 @@ require("lazy").setup({
         -- 커스텀 옵션이 필요한 서버는 커스텀 핸들러 지정
         ["clangd"] = function()
           vim.lsp.config('clangd', {
-            cmd = { 'clangd', '--background-index', '--clang-tidy' },
+            cmd = { 'clangd',
+            '--background-index',
+            '--clang-tidy',
+            '--completion-style=detailed',
+            '--header-insertion=iwyu', },
           })
           vim.lsp.enable('clangd')
         end,
@@ -258,14 +274,23 @@ require("lazy").setup({
       { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
     },
   },
---   {  -- TODO: config telescope.nvim to better file seeker TUI
---   'nvim-telescope/telescope.nvim', version = '*',
---   event = "VeryLazy",
---   dependencies = {
---     'nvim-lua/plenary.nvim',
---     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
---   }
--- },
+  --   {  -- TODO: config telescope.nvim to better file seeker TUI
+    --   'nvim-telescope/telescope.nvim', version = '*',
+    --   event = "VeryLazy",
+    --   dependencies = {
+      --     'nvim-lua/plenary.nvim',
+      --     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      --   }
+      -- },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.nvim' },            -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-mini/mini.icons' },        -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
+  },
 })
 
 local cmp = require('cmp') -- 3. 자동완성(cmp) 설정
@@ -315,7 +340,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 vim.diagnostic.config({
-  jump = { float = true },
+  jump = { on_jump = true },
   virtual_text = true,
   severity_sort = true,
 })

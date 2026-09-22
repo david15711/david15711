@@ -133,43 +133,56 @@
 | CTRL-U        | buffer에 있는 페이지의 절반 이동, [count] 입력 시 CTRL-Y와 같음 |
 | CTRL-B        | buffer에 있는 페이지 하나 이동,                                 |
 
+#### Buffers
+
+> [!NOTE]
+> A buffer is a file loaded into memory for editing.
+> The original file remains unchanged until you write the buffer to the file.
+
+파일을 편집하는 윈도우가 닫혀도 남아있으므로 유용
+
+| key               | description                                               |
+| ----------------- | --------------------------------------------------------- |
+| :buf[fer] [N]     | 해당 버퍼 숫자가 가리키는 파일 열기                       |
+| :ls / :buffers    | 편집기의 열려있는 파일들의 내용을 가진 버퍼 리스트를 연다 |
+| :bd[elete][!] [N] | [N]번 파일 버퍼 제거                                      |
+
+
 #### Window
-| key                      | description                                                                       |
-| ------------------------ | --------------------------------------------------------------------------------- |
-| CTRL-W                   | :wincmd 와 같은 동작, 추가 입력으로 동작                                          |
-| CTRL-W [number] w/CTRL-W | 이동 / [number]로 이동                                                            |
-| CTRL-W s/S/CTRL-S        | 화면 split, 수평으로 갈라짐 :hor :horizon :sp                                     |
-| CTRL-W v/V/CTRL-V        | 화면 split vertical, 수직으로 갈라짐 :vsp :vsplit :vs                             |
-| CTRL-W n/CTRL-N          | 화면 split, 새 파일 열기  == :new , :vnew                                         |
-| CTRL-W q/CTRL-Q          | split 화면 닫기                                                                   |
-| CTRL-W o/CTRL-O          | 현재 화면을 유일하게 (only) 하고 나머지 닫기                                      |
-| [number] CTRL-W c/CTRL-C | [number]번쨰의 / split 화면 닫기                                                  |
-| CTRL-W w/W/t/b/h/j/k/l   | 분할된 화면 간 이동, 순환/역순환/최상단/최하단/좌/하/상/우                        |
-| CTRL-W CTRL-^            | 현재 파일 분할 및 대체 파일로 편집                                                |
-| CTRL-W H/J/K/L           | 현재 포커스된 윈도우를 좌/하/상/우로 이동                                         |
-| CTRL-W r /CTRL-W R       | 현재 윈도우들을 회전 / 역회전                                                     |
-| CTRL-W x                 | (exchange) 현재 윈도우와 다음 (없으면 이전) 윈도우와 위치 변경                    |
-| CTRL-W T                 | 현재 split된 화면 하나를 tab page로 옮김 (열린 화면이 하나면 불가능)              |
-| CTRL-W - / +             | 현재 화면 높이를 줄임/높임                                                        |
-| CTRL-W _                 | 현재 화면 높이를 최대로                                                           |
-| CTRL-W < / >             | 현재 화면 폭을 줄임/높임, <와 >에 [number] 적용                                   |
-| CTRL-W <BAR>             | 현재 화면 폭을 최대로                                                             |
-| CTRL-W =                 | 현재 화면 폭 초기화                                                               |
-| z{number}<CR>            | <CR> = \r 화면 높이 {number}로 변경                                               |
-| :ls / :buffers           | 편집기의 파일들의 내용을 가진 버퍼 리스트를 연다, 파일이 닫혀도 남아있으므로 유용 |
-| :sb / :sbuffer           | split buffer, 버퍼 숫자를 기준으로 화면 스플릿                                    |
-| :vert / :hor             | :vertical / :horizon , 뒤에 오는 화면 분할/열기 명령어에 해당 속성을 강제한다     |
-| :bo[tright] / :to[pleft] | 뒤에 오는 화면 분할/열기 명령어에 해당 속성을 강제한다                            |
-| :difft[his]              | 현재 윈도우를 비교 윈도우로 만든다.                                               |
+| key                      | description                                                                   |
+| ------------------------ | ----------------------------------------------------------------------------- |
+| CTRL-W                   | :wincmd 와 같은 동작, 추가 입력으로 동작                                      |
+| CTRL-W [number] w/CTRL-W | 이동 / [number]로 이동                                                        |
+| CTRL-W s/S/CTRL-S        | 화면 split, 수평으로 갈라짐 :hor :horizon :sp                                 |
+| CTRL-W v/V/CTRL-V        | 화면 split vertical, 수직으로 갈라짐 :vsp :vsplit :vs                         |
+| CTRL-W n/CTRL-N          | 화면 split, 새 파일 열기  == :new , :vnew                                     |
+| CTRL-W q/CTRL-Q          | split 화면 닫기                                                               |
+| CTRL-W o/CTRL-O          | 현재 화면을 유일하게 (only) 하고 나머지 닫기                                  |
+| [number] CTRL-W c/CTRL-C | [number]번쨰의 / split 화면 닫기                                              |
+| CTRL-W w/W/t/b/h/j/k/l   | 분할된 화면 간 이동, 순환/역순환/최상단/최하단/좌/하/상/우                    |
+| CTRL-W CTRL-^            | 현재 파일 분할 및 대체 파일로 편집                                            |
+| CTRL-W H/J/K/L           | 현재 포커스된 윈도우를 좌/하/상/우로 이동                                     |
+| CTRL-W r /CTRL-W R       | 현재 윈도우들을 회전 / 역회전                                                 |
+| CTRL-W x                 | (exchange) 현재 윈도우와 다음 (없으면 이전) 윈도우와 위치 변경                |
+| CTRL-W T                 | 현재 split된 화면 하나를 tab page로 옮김 (열린 화면이 하나면 불가능)          |
+| CTRL-W - / +             | 현재 화면 높이를 줄임/높임                                                    |
+| CTRL-W _                 | 현재 화면 높이를 최대로                                                       |
+| CTRL-W < / >             | 현재 화면 폭을 줄임/높임, <와 >에 [number] 적용                               |
+| CTRL-W <BAR>             | 현재 화면 폭을 최대로                                                         |
+| CTRL-W =                 | 현재 화면 폭 초기화                                                           |
+| z{number}<CR>            | 화면 높이 {number}로 변경                                                     |
+| :vert / :hor             | :vertical / :horizon , 뒤에 오는 화면 분할/열기 명령어에 해당 속성을 강제한다 |
+| :bo[tright] / :to[pleft] | 뒤에 오는 화면 분할/열기 명령어에 해당 속성을 강제한다                        |
+| :sb / :sbuffer [number]  | [number]번 버퍼의 파일을 split 윈도우로 만든다                                |
+| :difft[his]              | 현재 윈도우를 비교 윈도우로 만든다.                                           |
+
 
 #### tab page
-| key                     | description                                                                    |
-| ----------------------- | ------------------------------------------------------------------------------ |
-| g<tab>                  | 탭 간 이동 (마지막으로 간 tab page)                                            |
-| [number] g t / T        | 탭 오른쪽 / 왼쪽 이동, [number] 탭으로 이동                                    |
-| :tabm [number$#+-]      | 현재 탭을 하나 이동 / [number] 위치로 이동 $:마지막 #:직전탭우측 +:우측 -:좌측 |
-| :buf[fer]               | 파일 버퍼 목록 보기                                                            |
-| :sb / :sbuffer [number] | [number]번 버퍼의 파일을 split 윈도우로 만든다                                 |
+| key                | description                                                                    |
+| ------------------ | ------------------------------------------------------------------------------ |
+| g<tab>             | 탭 간 이동 (마지막으로 간 tab page)                                            |
+| [number] g t / T   | 탭 오른쪽 / 왼쪽 이동, [number] 탭으로 이동                                    |
+| :tabm [number$#+-] | 현재 탭을 하나 이동 / [number] 위치로 이동 $:마지막 #:직전탭우측 +:우측 -:좌측 |
 
 #### Jumps
 커서의 점프 기록을 담는 스택

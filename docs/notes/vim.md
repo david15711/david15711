@@ -135,7 +135,7 @@
 
 #### Buffers
 
-> [!NOTE]
+> [!TIP]
 > A buffer is a file loaded into memory for editing.
 > The original file remains unchanged until you write the buffer to the file.
 
@@ -146,7 +146,6 @@
 | :buf[fer] [N]     | 해당 버퍼 숫자가 가리키는 파일 열기                       |
 | :ls / :buffers    | 편집기의 열려있는 파일들의 내용을 가진 버퍼 리스트를 연다 |
 | :bd[elete][!] [N] | [N]번 파일 버퍼 제거                                      |
-
 
 #### Window
 | key                      | description                                                                   |

@@ -69,8 +69,8 @@
 		<td>
 			<img src="https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white">
 			<img src="https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github&logoColor=white">
-			<img src="https://img.shields.io/badge/WireGuard-88171A?style=flat-square&logo=wireguard&logoColor=white">
-			<img src="https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white">
+			<img src="https://img.shields.io/badge/WireGuard-88171A?style=flat-square&logo=wireguard&logoColor=white" style="opacity: 0.6;">
+			<img src="https://img.shields.io/badge/Nginx-009639?style=flat-square&logo=nginx&logoColor=white" style="opacity: 0.6;">
 			<!-- <img src="https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white"> -->
 		</td>
 	</tr>
@@ -96,25 +96,25 @@
 			<img src="https://img.shields.io/badge/Vim-019733?style=flat-square&logo=vim&logoColor=white">
 			<img src="https://img.shields.io/badge/Neovim-57A143?style=flat-square&logo=neovim&logoColor=white">
 			<img src="https://img.shields.io/badge/IAR_Workbench-0A0A0A?style=flat-square&logo=arm&logoColor=white">
-			<img src="https://img.shields.io/badge/KiCad-314DA0?style=flat-square&logo=kicad&logoColor=white">
+			<img src="https://img.shields.io/badge/KiCad-314DA0?style=flat-square&logo=kicad&logoColor=white" style="opacity: 0.6;">
 		</td>
 	</tr>
 	<tr>
 		<td width="200"><b>Library</b></td>
 		<td>
-			<img src="https://img.shields.io/badge/OpenGL-555555?style=flat-square&logo=opengl&logoColor=white">
-			<img src="https://img.shields.io/badge/PyQt-41CD52?style=flat-square&logo=qt&logoColor=white">
-			<img src="https://img.shields.io/badge/Matplotlib-11557C?style=flat-square&logo=python&logoColor=white">
-			<img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white">
-			<img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white">
-			<img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white">
+			<img src="https://img.shields.io/badge/OpenGL-555555?style=flat-square&logo=opengl&logoColor=white" style="opacity: 0.6;">
+			<img src="https://img.shields.io/badge/PyQt-41CD52?style=flat-square&logo=qt&logoColor=white" style="opacity: 0.6;">
+			<img src="https://img.shields.io/badge/Matplotlib-11557C?style=flat-square&logo=python&logoColor=white" style="opacity: 0.6;">
+			<img src="https://img.shields.io/badge/Pandas-150458?style=flat-square&logo=pandas&logoColor=white" style="opacity: 0.6;">
+			<img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=flat-square&logo=pytorch&logoColor=white" style="opacity: 0.6;">
+			<img src="https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" style="opacity: 0.6;">
 		</td>
 	</tr>
 	<tr>
 		<td width="200"><b>Markup</b></td>
 		<td>
 			<img src="https://img.shields.io/badge/Markdown-000000?style=flat-square&logo=markdown&logoColor=white">
-			<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white">
+			<img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" style="opacity: 0.6;">
 		</td>
 	</tr>
 	<tr>

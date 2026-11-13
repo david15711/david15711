@@ -186,8 +186,7 @@
 | key                      | description                                                                   |
 | ------------------------ | ----------------------------------------------------------------------------- |
 | CTRL-W                   | :wincmd 와 같은 동작, 추가 입력으로 동작                                      |
-| CTRL-W {number} w/CTRL-W | 이동 / {number}로 이동                                                        |
-| CTRL-W s/S/CTRL-S        | 화면 split, 수평으로 갈라짐 :hor :horizon :sp                                 |
+| CTRL-W s/S/CTRL-S        | 화면 split, 수평으로 갈라짐 == :hor :horizon :sp                              |
 | CTRL-W v/V/CTRL-V        | 화면 split vertical, 수직으로 갈라짐 :vsp :vsplit :vs                         |
 | CTRL-W n/CTRL-N          | 화면 split, 새 파일 열기  == :new , :vnew                                     |
 | CTRL-W q/CTRL-Q          | split 화면 닫기                                                               |
@@ -197,7 +196,7 @@
 | CTRL-W t/b/h/j/k/l       | 분할된 화면 간 이동, 최상단/최하단/좌/하/상/우                                |
 | CTRL-W CTRL-^            | 현재 파일 분할 및 대체 파일 편집 (마지막 버퍼에 있는 파일)                    |
 | CTRL-W H/J/K/L           | 현재 포커스된 윈도우를 좌/하/상/우로 이동                                     |
-| CTRL-W r /CTRL-W R       | 현재 윈도우들을 회전 / 역회전                                                 |
+| CTRL-W r / R             | 현재 윈도우들을 회전 / 역회전                                                 |
 | CTRL-W x                 | (exchange) 현재 윈도우와 다음 (없으면 이전) 윈도우와 위치 변경                |
 | CTRL-W T                 | 현재 split된 화면 하나를 tab page로 옮김 (열린 화면이 하나면 불가능)          |
 | CTRL-W - / +             | 현재 화면 높이를 줄임/높임                                                    |

@@ -43,13 +43,12 @@
 - word: 문자, 숫자, _만 포함하여 단어로 여기고 나머지는 구분자.
 - WORD: 의미상 단어, 공백을 제외한 모든 기호 포함하여 단어.
 
-| key   | behavior                            |
-| ----- | ----------------------------------- |
-| w / W | 다음 word 머리로 / 다음 WORD 머리로 |
-| e / E | word 끝으로 / WORD 단위 끝으로      |
-| b / B | word 앞 머리로 / WORD 앞 머리로     |
-| ge    | 이전 word 끝으로                    |
-| gE    | 이전 WORD 끝으로                    |
+| key     | behavior                            |
+| ------- | ----------------------------------- |
+| w / W   | 다음 word 머리로 / 다음 WORD 머리로 |
+| e / E   | word 끝으로 / WORD 끝으로      |
+| b / B   | word 앞 머리로 / WORD 앞 머리로     |
+| ge / gE | 이전 word 끝으로 / 이전 WORD 끝으로 |
 
 ##### Text Object motions
 

@@ -46,7 +46,7 @@
 | key     | behavior                            |
 | ------- | ----------------------------------- |
 | w / W   | 다음 word 머리로 / 다음 WORD 머리로 |
-| e / E   | word 끝으로 / WORD 끝으로      |
+| e / E   | word 끝으로 / WORD 끝으로           |
 | b / B   | word 앞 머리로 / WORD 앞 머리로     |
 | ge / gE | 이전 word 끝으로 / 이전 WORD 끝으로 |
 
@@ -95,39 +95,39 @@
 
 #### 편집
 
-| key                | behavior                                                                                   |
-| ------------------ | ------------------------------------------------------------------------------------------ |
-| a / A              | 현재 커서 다음에 삽입 입력 / 행 뒤에 삽입 입력                                             |
-| i / I              | 현재 커서 앞에 삽입 입력 / 행 앞에 삽입 입력                                               |
-| o / O              | 현재 커서 다음 줄에 행 삽입 후 입력 / 현재 커서 이전 줄에 행 삽입 후 입력                  |
-| x / X              | 현재 커서 지우기 / 커서 앞 지우기                                                          |
-| d / D              | d 이후 커맨드에 따라 지우기 / 문장 지우기                                                  |
-| dd                 | 문장 줄 지우기 / 1번 레지스터에 저장됨 ("1로 사용)                                         |
-| c {motion} / C     | c 이후 {motion}에 따라 바꾸기 / 커서 뒤로 행 끝까지 바꾸기                                 |
-| cc                 | 문장 줄 지우고 삽입                                                                        |
-| s / S              | char 바꾸기/ 행 전체 바꾸기                                                                |
-| u                  | undo                                                                                       |
-| U                  | 줄단위 undo, 다시 하면 줄단위 redo, 특수 행동으로 취급되어 행동 스택에 쌓임                |
-| CTRL-R             | redo                                                                                       |
-| ~                  | 하나 대소문자 바꾸기                                                                       |
-| <{motion}<         | {motion} 만큼의 문장을 왼쪽 들여쓰기                                                       |
-| >{motion}>         | {motion} 만큼의 문장을 오른쪽 들여쓰기                                                     |
-| .                  | 마지막 편집 반복                                                                           |
-| J                  | 아래 행 합치기(현 행 끝 줄바꿈 없앰)                                                       |
-| &                  | 마지막으로 진행했던 :s (substitution) 반복                                                 |
-| v / V / CTRL-V     | 비주얼 모드 / 비주얼 라인 모드 / 비주얼 블록 모드 (CTRL-V가 붙여넣기인 환경에서 CTRL-Q)    |
-| "{1-9a-zA-z}       | 레지스터 사용, yank, paste 등 가능                                                         |
-| CTRL-A             | 커서 위치의 숫자 또는 알파벳 문자의 값을 증가시킨다                                        |
-| CTRL-X             | 커서 위치의 숫자 또는 알파벳 문자의 값을 감소시킨다                                        |
-| guu  /  gugu       | 해당 라인 영문자를 소문자로                                                                |
-| gUU  /  gUgU       | 해당 라인 영문자를 대문자로                                                                |
-| CTRL-G             | 커맨드 라인에 파일 이름, 파일 상태, 줄 등 상태 표시                                        |
-| g_CTRL-G           | 커맨드 라인에 현재 커서 위치를 Column, Line, Word, Character and Byte 로 표시              |
-| ZZ                 | write 및 quit, :x (write, quit but write only when changed) 와 같음                        |
-| ZQ                 | quit without checking for changes, :q! 와 같음                                             |
-| :m / :mov {number} | 현재 줄의 내용을 {number}줄 아래로 보내기                                                  |
-| :co {number}       | 현재 줄의 내용을 복사해서 {number}줄 아래로 붙여넣기                                       |
-| :norm {commands}   | {commands} 일괄 적용, :1,10norm A; 시 1부터 10까지의 줄에서 명령어 A(Append)후 ; 작성 동작 |
+| key                | behavior                                                                                |
+| ------------------ | --------------------------------------------------------------------------------------- |
+| a / A              | 현재 커서 다음에 삽입 입력 / 행 뒤에 삽입 입력                                          |
+| i / I              | 현재 커서 앞에 삽입 입력 / 행 앞에 삽입 입력                                            |
+| o / O              | 현재 커서 다음 줄에 행 삽입 후 입력 / 현재 커서 이전 줄에 행 삽입 후 입력               |
+| x / X              | 현재 커서 지우기 / 커서 앞 지우기                                                       |
+| d / D              | d 이후 커맨드에 따라 지우기 / 문장 지우기                                               |
+| dd                 | 문장 줄 지우기 / 1번 레지스터에 저장됨 ("1로 사용)                                      |
+| c {motion} / C     | c 이후 {motion}에 따라 바꾸기 / 커서 뒤로 행 끝까지 바꾸기                              |
+| cc                 | 문장 줄 지우고 삽입                                                                     |
+| s / S              | char 바꾸기/ 행 전체 바꾸기                                                             |
+| u                  | undo                                                                                    |
+| U                  | 줄단위 undo, 다시 하면 줄단위 redo, 특수 행동으로 취급되어 행동 스택에 쌓임             |
+| CTRL-R             | redo                                                                                    |
+| ~                  | 하나 대소문자 바꾸기                                                                    |
+| <{motion}<         | {motion} 만큼의 문장을 왼쪽 들여쓰기                                                    |
+| >{motion}>         | {motion} 만큼의 문장을 오른쪽 들여쓰기                                                  |
+| .                  | 마지막 편집 반복                                                                        |
+| J                  | 아래 행 합치기(현 행 끝 줄바꿈 없앰)                                                    |
+| &                  | 마지막으로 진행했던 :s (substitution) 반복                                              |
+| v / V / CTRL-V     | 비주얼 모드 / 비주얼 라인 모드 / 비주얼 블록 모드 (CTRL-V가 붙여넣기인 환경에서 CTRL-Q) |
+| "{1-9a-zA-z}       | 레지스터 사용, yank, paste 등 가능                                                      |
+| CTRL-A             | 커서 위치의 숫자 또는 알파벳 문자의 값을 증가시킨다                                     |
+| CTRL-X             | 커서 위치의 숫자 또는 알파벳 문자의 값을 감소시킨다                                     |
+| guu  /  gugu       | 해당 라인 영문자를 소문자로                                                             |
+| gUU  /  gUgU       | 해당 라인 영문자를 대문자로                                                             |
+| CTRL-G             | 커맨드 라인에 파일 이름, 파일 상태, 줄 등 상태 표시                                     |
+| g_CTRL-G           | 커맨드 라인에 현재 커서 위치를 Column, Line, Word, Character and Byte 로 표시           |
+| ZZ                 | write 및 quit, :x (write, quit but write only when changed) 와 같음                     |
+| ZQ                 | quit without checking for changes, :q! 와 같음                                          |
+| :m / :mov {number} | 현재 줄의 내용을 {number}줄 아래로 보내기                                               |
+| :co {number}       | 현재 줄의 내용을 복사해서 {number}줄 아래로 붙여넣기                                    |
+| :norm {cmd}        | {cmd} 일괄 적용, :1,10norm A; 시 1부터 10까지의 줄에서 명령어 A(Append)후 ; 작성 동작   |
 
 ##### 반복 매크로
 | key                   | behavior                                                        |
@@ -312,6 +312,46 @@
 | :tag {name}     | {name} 식별자의 태그로 이동                             |
 | :tags           | 태그 스택 내용 표시                                     |
 
+#### Quickfix List
+
+ 컴파일 오류나 검색 결과 등 여러 파일·라인 위치 목록을 모아 에디터 안에서 빠르게 순회하고 수정할 수 있게 해주는 기능입니다.
+
+`:grep`용 내부 `grepprg` 변수 설정 (ripgrep 사용 시)
+```vim
+if executable('rg')
+  set grepprg=rg\ --vimgrep\ --smart-case
+  set grepformat=%f:%l:%c:%m
+endif
+```
+
+| 명령어               | 기능                                                      |
+| -------------------- | --------------------------------------------------------- |
+| `:grep {패턴}`       | `grepprg`으로 패턴을 검색하고 결과를 quickfix 목록에 채움 |
+| `:copen`             | quickfix 목록 창 열기                                     |
+| `:cclose`            | quickfix 목록 창 닫기                                     |
+| `:cnext` / `:cn`     | quickfix 목록의 다음 항목으로 이동                        |
+| `:cprev` / `:cp`     | quickfix 목록의 이전 항목으로 이동                        |
+| `:cfirst` / `:clast` | quickfix 목록의 첫 번째 / 마지막 항목으로 이동            |
+| `:clist`             | quickfix 목록의 항목들을 화면에 출력/확인                 |
+| `:cdo {cmd}`         | quickfix 목록의 각 항목(줄)에 대해 {cmd} 실행             |
+| `:cfdo {cmd}`        | quickfix 목록에 포함된 각 파일 단위로 {cmd} 실행          |
+
+#### Location List
+
+ Quickfix List와 유사하지만, 전역(Global) 목록이 아닌 현재 윈도우(Window)에 종속된 로컬 목록입니다. 창마다 개별 목록을 독립적으로 유지할 수 있습니다. (대부분의 Quickfix 명령어에서 `c` 대신 `l` 접두사 사용)
+
+| 명령어               | 기능                                                                |
+| -------------------- | ------------------------------------------------------------------- |
+| `:lgrep {패턴}`      | `grepprg`으로 패턴을 검색하고 결과를 현재 창의 location list에 채움 |
+| `:lopen`             | location list 목록 창 열기                                          |
+| `:lclose`            | location list 목록 창 닫기                                          |
+| `:lnext` / `:lne`    | location list 목록의 다음 항목으로 이동                             |
+| `:lprev` / `:lp`     | location list 목록의 이전 항목으로 이동                             |
+| `:lfirst` / `:llast` | location list 목록의 첫 번째 / 마지막 항목으로 이동                 |
+| `:llist`             | location list 목록의 항목들을 화면에 출력/확인                      |
+| `:ldo {cmd}`         | location list 목록의 각 항목(줄)에 대해 {cmd} 실행                  |
+| `:lfdo {cmd}`        | location list 목록에 포함된 각 파일 단위로 {cmd} 실행               |
+
 #### Internal Variable
 
 | prefix      | description                                              |
@@ -334,5 +374,5 @@
 #### External Program
 | key               | description                                                                     |
 | ----------------- | ------------------------------------------------------------------------------- |
-| :!{commands}      | 외부 서브쉘을 열어서 {commands}를 실행한다. 파일 전체를 리다이렉션              |
+| :!{cmd}           | 외부 서브쉘을 열어서 {cmd}를 실행한다. 파일 전체를 리다이렉션                   |
 | !{motion}{filter} | 지정된 범위의 문자열을 외부 변환 프로그램을 통해 가공한다. (awk, sed, sort 등 ) |

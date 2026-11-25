@@ -128,10 +128,19 @@
 | :m / :mov {number} | 현재 줄의 내용을 {number}줄 아래로 보내기                                               |
 | :co {number}       | 현재 줄의 내용을 복사해서 {number}줄 아래로 붙여넣기                                    |
 | :norm {cmd}        | {cmd} 일괄 적용, :1,10norm A; 시 1부터 10까지의 줄에서 명령어 A(Append)후 ; 작성 동작   |
-| i_CTRL-O           | insert 모드에서, 명령어 하나를 실행하고 insert로 복귀                                   |
-| i_CTRL-W           | insert 모드에서, 커서 앞의 단어 앞까지 지우기                                           |
-| i_CTRL-U           | insert 모드에서, 커서 앞의 문장 앞까지 지우기                                           |
-| i_CTRL-H           | insert 모드에서, Backspace와 동일                                                       |
+
+
+**insert-special-keys**
+| key      | behavior                                                 |
+| -------- | -------------------------------------------------------- |
+| i_CTRL-@ | insert 모드에서, 이전에 추가한 문구를 추가하고 모드 탈출 |
+| i_CTRL-A | insert 모드에서, 이전에 추가한 문구를 추가               |
+| i_CTRL-H | insert 모드에서, 하나 지우기, Backspace와 동일           |
+| i_CTRL-W | insert 모드에서, 커서 앞의 단어 앞까지 지우기            |
+| i_CTRL-U | insert 모드에서, 커서 앞의 문장 앞까지 지우기            |
+| i_CTRL-I | insert 모드에서, tab 삽입
+| i_CTRL-J | insert 모드에서, newline 삽입
+| i_CTRL-O | insert 모드에서, 명령어 하나를 실행하고 insert로 복귀    |
 
 ##### 반복 매크로
 | key             | behavior                                                        |

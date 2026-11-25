@@ -373,7 +373,7 @@
 #### tagsrch (tag search)
 | key             | description                                             |
 | --------------- | ------------------------------------------------------- |
-| `CTRL-]`        | Jump to definition of keyword under the cursor          |
+| CTRL-]        | Jump to definition of keyword under the cursor          |
 | {number} CTRL-T | {number} 만큼 이전의 tag 이동 스택으로 복귀 (default 1) |
 | CTRL-W CTRL-I   | 정의로 이동하는 데, 새로운 split window에다가 열어줌    |
 | :tag {name}     | {name} 식별자의 태그로 이동                             |
@@ -393,15 +393,15 @@ endif
 
 | 명령어               | 기능                                                      |
 | -------------------- | --------------------------------------------------------- |
-| `:grep {패턴}`       | `grepprg`으로 패턴을 검색하고 결과를 quickfix 목록에 채움 |
-| `:copen`             | quickfix 목록 창 열기                                     |
-| `:cclose`            | quickfix 목록 창 닫기                                     |
-| `:cnext` / `:cn`     | quickfix 목록의 다음 항목으로 이동                        |
-| `:cprev` / `:cp`     | quickfix 목록의 이전 항목으로 이동                        |
-| `:cfirst` / `:clast` | quickfix 목록의 첫 번째 / 마지막 항목으로 이동            |
-| `:clist`             | quickfix 목록의 항목들을 화면에 출력/확인                 |
-| `:cdo {cmd}`         | quickfix 목록의 각 항목(줄)에 대해 {cmd} 실행             |
-| `:cfdo {cmd}`        | quickfix 목록에 포함된 각 파일 단위로 {cmd} 실행          |
+| :grep {패턴}       | grepprg으로 패턴을 검색하고 결과를 quickfix 목록에 채움 |
+| :copen             | quickfix 목록 창 열기                                     |
+| :cclose            | quickfix 목록 창 닫기                                     |
+| :cnext / :cn     | quickfix 목록의 다음 항목으로 이동                        |
+| :cprev / :cp     | quickfix 목록의 이전 항목으로 이동                        |
+| :cfirst / :clast | quickfix 목록의 첫 번째 / 마지막 항목으로 이동            |
+| :clist             | quickfix 목록의 항목들을 화면에 출력/확인                 |
+| :cdo {cmd}         | quickfix 목록의 각 항목(줄)에 대해 {cmd} 실행             |
+| :cfdo {cmd}        | quickfix 목록에 포함된 각 파일 단위로 {cmd} 실행          |
 
 #### Location List
 
@@ -409,15 +409,15 @@ endif
 
 | 명령어               | 기능                                                                |
 | -------------------- | ------------------------------------------------------------------- |
-| `:lgrep {패턴}`      | `grepprg`으로 패턴을 검색하고 결과를 현재 창의 location list에 채움 |
-| `:lopen`             | location list 목록 창 열기                                          |
-| `:lclose`            | location list 목록 창 닫기                                          |
-| `:lnext` / `:lne`    | location list 목록의 다음 항목으로 이동                             |
-| `:lprev` / `:lp`     | location list 목록의 이전 항목으로 이동                             |
-| `:lfirst` / `:llast` | location list 목록의 첫 번째 / 마지막 항목으로 이동                 |
-| `:llist`             | location list 목록의 항목들을 화면에 출력/확인                      |
-| `:ldo {cmd}`         | location list 목록의 각 항목(줄)에 대해 {cmd} 실행                  |
-| `:lfdo {cmd}`        | location list 목록에 포함된 각 파일 단위로 {cmd} 실행               |
+| :lgrep {패턴}      | grepprg으로 패턴을 검색하고 결과를 현재 창의 location list에 채움 |
+| :lopen             | location list 목록 창 열기                                          |
+| :lclose            | location list 목록 창 닫기                                          |
+| :lnext / :lne    | location list 목록의 다음 항목으로 이동                             |
+| :lprev / :lp     | location list 목록의 이전 항목으로 이동                             |
+| :lfirst / :llast | location list 목록의 첫 번째 / 마지막 항목으로 이동                 |
+| :llist             | location list 목록의 항목들을 화면에 출력/확인                      |
+| :ldo {cmd}         | location list 목록의 각 항목(줄)에 대해 {cmd} 실행                  |
+| :lfdo {cmd}        | location list 목록에 포함된 각 파일 단위로 {cmd} 실행               |
 
 #### Internal Variable
 

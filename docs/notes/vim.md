@@ -152,7 +152,7 @@
 일반 편집기의 드래그 상태처럼 범위를 지정한다. 이 상태의 키보드 입력은 문자로 드래그 범위 대신 치환된다.
 | key      | behavior                        |
 | -------- | ------------------------------- |
-| v_CTRL-G | select mode 진입 |
+| v_CTRL-G | select mode 진입                |
 | gh       | select mode (characterwise)진입 |
 | gH       | select mode (linewise)진입      |
 | g_CTRL-H | select mode (blockwise)진입     |
